@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"github.com/shufflingpixels/laravel-ls/lsp/protocol"
+	"laravel-ls/lsp/protocol"
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
 

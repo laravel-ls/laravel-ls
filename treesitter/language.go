@@ -3,7 +3,7 @@ package treesitter
 import (
 	blade "github.com/EmranMR/tree-sitter-blade/bindings/go"
 	dotenv "github.com/pnx/tree-sitter-dotenv/bindings/go"
-	"github.com/shufflingpixels/laravel-ls/file"
+	"laravel-ls/file"
 	ts "github.com/tree-sitter/go-tree-sitter"
 	html "github.com/tree-sitter/tree-sitter-html/bindings/go"
 	php "github.com/tree-sitter/tree-sitter-php/bindings/go"

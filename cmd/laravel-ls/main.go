@@ -6,12 +6,13 @@ import (
 	"path"
 	"strings"
 
-	laravel_ls "github.com/shufflingpixels/laravel-ls"
-	"github.com/shufflingpixels/laravel-ls/laravel/providers/env"
-	"github.com/shufflingpixels/laravel-ls/laravel/providers/view"
-	"github.com/shufflingpixels/laravel-ls/lsp/server"
-	"github.com/shufflingpixels/laravel-ls/lsp/transport"
-	"github.com/shufflingpixels/laravel-ls/provider"
+	laravel_ls "laravel-ls"
+	"laravel-ls/laravel/providers/env"
+	"laravel-ls/laravel/providers/view"
+	"laravel-ls/lsp/server"
+	"laravel-ls/lsp/transport"
+	"laravel-ls/provider"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

@@ -1,8 +1,9 @@
 package provider
 
 import (
-	"github.com/shufflingpixels/laravel-ls/cache"
-	"github.com/shufflingpixels/laravel-ls/parser"
+	"laravel-ls/cache"
+	"laravel-ls/parser"
+
 	log "github.com/sirupsen/logrus"
 )
 

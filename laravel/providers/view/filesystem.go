@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/shufflingpixels/laravel-ls/file"
-	"github.com/shufflingpixels/laravel-ls/laravel"
+	"laravel-ls/file"
+	"laravel-ls/laravel"
 )
 
 // TODO: Cache

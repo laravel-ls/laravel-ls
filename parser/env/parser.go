@@ -3,8 +3,8 @@ package env
 import (
 	"errors"
 
-	"github.com/shufflingpixels/laravel-ls/parser"
-	"github.com/shufflingpixels/laravel-ls/treesitter"
+	"laravel-ls/parser"
+	"laravel-ls/treesitter"
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
 

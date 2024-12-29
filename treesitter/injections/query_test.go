@@ -3,8 +3,8 @@ package injections_test
 import (
 	"testing"
 
-	"github.com/shufflingpixels/laravel-ls/treesitter"
-	"github.com/shufflingpixels/laravel-ls/treesitter/injections"
+	"laravel-ls/treesitter"
+	"laravel-ls/treesitter/injections"
 	"github.com/stretchr/testify/assert"
 	ts "github.com/tree-sitter/go-tree-sitter"
 )

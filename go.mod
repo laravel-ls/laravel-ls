@@ -1,4 +1,4 @@
-module github.com/shufflingpixels/laravel-ls
+module laravel-ls
 
 go 1.22.9
 

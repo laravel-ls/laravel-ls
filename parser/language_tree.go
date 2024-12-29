@@ -3,9 +3,9 @@ package parser
 import (
 	"fmt"
 
-	"github.com/shufflingpixels/laravel-ls/treesitter"
-	"github.com/shufflingpixels/laravel-ls/treesitter/debug"
-	"github.com/shufflingpixels/laravel-ls/treesitter/injections"
+	"laravel-ls/treesitter"
+	"laravel-ls/treesitter/debug"
+	"laravel-ls/treesitter/injections"
 	"github.com/sirupsen/logrus"
 	ts "github.com/tree-sitter/go-tree-sitter"
 )

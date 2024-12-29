@@ -8,10 +8,11 @@ import (
 	"io"
 	"strings"
 
-	laravel_ls "github.com/shufflingpixels/laravel-ls"
-	"github.com/shufflingpixels/laravel-ls/cache"
-	"github.com/shufflingpixels/laravel-ls/lsp/protocol"
-	"github.com/shufflingpixels/laravel-ls/provider"
+	laravel_ls "laravel-ls"
+	"laravel-ls/cache"
+	"laravel-ls/lsp/protocol"
+	"laravel-ls/provider"
+
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"github.com/sourcegraph/jsonrpc2"
