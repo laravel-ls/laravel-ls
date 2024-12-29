@@ -7,12 +7,12 @@ import (
 )
 
 type Print struct {
-	AnonNodes    bool
-	IndentString string
+	AnonNodes  bool
+	IndentSize uint
 }
 
 func (p Print) Indent(depth uint) string {
-	return strings.Repeat(p.IndentString, int(depth))
+	return strings.Repeat(" ", int(p.IndentSize*depth))
 }
 
 func (p Print) Inner(node *ts.Node, depth uint) string {

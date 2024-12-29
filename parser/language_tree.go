@@ -181,7 +181,7 @@ func findTreeForLanguage(language string, trees []*LanguageTree) *LanguageTree {
 
 func VisualizeLanguageTree(tree *LanguageTree) string {
 	printer := debug.Print{
-		IndentString: "  ",
+		IndentSize: 2,
 	}
 
 	return visualizeLanguageTreeInner(printer, tree, nil, 0)
