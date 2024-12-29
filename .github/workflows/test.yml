@@ -1,0 +1,29 @@
+name: Test
+
+permissions:
+  contents: read
+
+on:
+  - push
+  - pull_request
+
+jobs:
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        go-version: ["1.22"]
+        arch: [ 386, amd64 ]
+    runs-on: ubuntu-latest
+    name: Test (${{matrix.arch}} go v${{ matrix.go-version }})
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ matrix.go-version }}
+
+    - name: Test
+      run: GOARCH=${{matrix.arch}} go test -v ./...
