@@ -6,6 +6,7 @@ import (
 	"path"
 	"strings"
 
+	laravel_ls "github.com/shufflingpixels/laravel-ls"
 	"github.com/shufflingpixels/laravel-ls/laravel/providers/env"
 	"github.com/shufflingpixels/laravel-ls/laravel/providers/view"
 	"github.com/shufflingpixels/laravel-ls/lsp/server"
@@ -30,9 +31,9 @@ func expandHome(path string) string {
 }
 
 var rootCmd = &cobra.Command{
-	Use:     "laravel-ls",
+	Use:     laravel_ls.Name,
 	Short:   "Language server for Laravel",
-	Version: "0.0.1",
+	Version: laravel_ls.Version,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		basePath = expandHome(basePath)
 
@@ -66,6 +67,7 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.PersistentFlags().StringVar(&basePath, "basePath", "~/.local/laravel-ls", "base path")
+	rootCmd.SetVersionTemplate(`{{with .Name}}{{printf "%s " .}}{{end}}{{printf "%s" .Version}}` + "\n")
 }
 
 func main() {

@@ -8,6 +8,7 @@ import (
 	"io"
 	"strings"
 
+	laravel_ls "github.com/shufflingpixels/laravel-ls"
 	"github.com/shufflingpixels/laravel-ls/cache"
 	"github.com/shufflingpixels/laravel-ls/lsp/protocol"
 	"github.com/shufflingpixels/laravel-ls/provider"
@@ -20,11 +21,6 @@ var (
 	ErrNonLocalPath             = errors.New("server only support local filesystem paths.")
 	ErrFileNotOpened            = errors.New("File not opened")
 	ErrFailedToGetPointAtCursor = errors.New("Failed to get node at cursor")
-)
-
-const (
-	SERVER_NAME    = "laravel-ls"
-	SERVER_VERSION = "0.0.1"
 )
 
 type Server struct {
@@ -141,7 +137,7 @@ func (s *Server) HandleTextDocumentDiagnostic(params protocol.DocumentDiagnostic
 				End:   FromTSPoint(end),
 			},
 			Severity: protocol.DiagnosticSeverity(diagnostic.Severity),
-			Source:   SERVER_NAME,
+			Source:   laravel_ls.Name,
 			Message:  diagnostic.Message,
 		})
 	}
@@ -283,8 +279,8 @@ func (s *Server) HandleInitialize(params protocol.InitializeParams) (protocol.In
 			DiagnosticProvider: true,
 		},
 		ServerInfo: &protocol.ServerInfo{
-			Name:    SERVER_NAME,
-			Version: SERVER_VERSION,
+			Name:    laravel_ls.Name,
+			Version: laravel_ls.Version,
 		},
 	}, nil
 }
