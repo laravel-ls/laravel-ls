@@ -1,0 +1,39 @@
+name: Release
+permissions:
+  contents: write
+
+on:
+  release:
+    types: [ created ]
+
+jobs:
+  cross-compile:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ linux ]
+        arch: [ 386, amd64, arm, arm64 ]
+    name: Release - ${{matrix.os}}-${{matrix.arch}}
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.22
+
+      - name: compile
+        run: |
+          GOOS=${{matrix.os}} GOARCH=${{matrix.arch}} make
+
+      - name: Upload thalos-server
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_name: laravel-ls-${{github.event.release.tag_name}}-${{matrix.os}}-${{matrix.arch}}
+          asset_path: build/laravel-ls
+          asset_content_type: application/octal-stream
+
