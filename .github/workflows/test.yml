@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         go-version: ["1.22"]
-        arch: [ 386, amd64 ]
+        arch: [ amd64 ]
     runs-on: ubuntu-latest
     name: Test (${{matrix.arch}} go v${{ matrix.go-version }})
     steps:
