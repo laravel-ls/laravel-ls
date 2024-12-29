@@ -1,3 +1,5 @@
+[![Test](https://github.com/shufflingpixels/laravel-ls/actions/workflows/test.yml/badge.svg)](https://github.com/shufflingpixels/laravel-ls/actions/workflows/test.yml)
+
 # Laravel-ls
 
 Laravel Language Server written in go.
@@ -30,7 +32,7 @@ Env::get('APP_NAME');
 - [x] Go to `.env` file and key location
 - [x] Auto-complete for defined keys.
 - [x] Diagnostics for non defined keys.
-- [ ] code action to create missing key
+- [ ] Code action to create missing key
 
 ### Config
 
@@ -46,7 +48,7 @@ Config::get('app.name')
 
 ### Blade components
 
-```
+```html
 <x-component.name />
 <x-component name="dynamic-component" />
 ```
