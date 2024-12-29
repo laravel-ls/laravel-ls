@@ -1,4 +1,4 @@
-[![Test](https://github.com/shufflingpixels/laravel-ls/actions/workflows/test.yml/badge.svg)](https://github.com/shufflingpixels/laravel-ls/actions/workflows/test.yml)
+[![Test](https://github.com/laravel-ls/laravel-ls/actions/workflows/test.yml/badge.svg)](https://github.com/laravel-ls/laravel-ls/actions/workflows/test.yml)
 
 # Laravel-ls
 
