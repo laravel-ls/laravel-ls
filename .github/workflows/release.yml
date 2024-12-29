@@ -7,14 +7,14 @@ on:
     types: [ created ]
 
 jobs:
-  cross-compile:
+  compile:
     strategy:
       fail-fast: false
       matrix:
         os: [ linux ]
         arch: [ amd64 ]
     name: Release - ${{matrix.os}}-${{matrix.arch}}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
