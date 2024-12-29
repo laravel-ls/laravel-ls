@@ -36,7 +36,7 @@ func (t *LanguageTree) Root() *ts.Node {
 
 func (t *LanguageTree) InRange(r ts.Range) bool {
 	for _, c := range t.ranges {
-		if treesitter.RangeIntersect(c, r) {
+		if treesitter.RangeOverlap(c, r) {
 			return true
 		}
 	}
@@ -160,7 +160,7 @@ func (t *LanguageTree) GetLanguageTreesWithNode(language string, node *ts.Node) 
 
 	logrus.Debug(t.language, t.Root().Range(), node.Range())
 
-	if t.language == language && treesitter.RangeIntersect(t.Root().Range(), node.Range()) {
+	if t.language == language && treesitter.RangeOverlap(t.Root().Range(), node.Range()) {
 		results = append(results, t)
 	}
 

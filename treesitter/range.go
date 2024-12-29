@@ -13,7 +13,7 @@ func PointInRange(p ts.Point, r ts.Range) bool {
 }
 
 // Returns true if range a and b overlaps.
-func RangeIntersect(a ts.Range, b ts.Range) bool {
+func RangeOverlap(a ts.Range, b ts.Range) bool {
 	return (a.StartByte >= b.StartByte && a.EndByte <= b.EndByte) ||
 		(b.StartByte >= a.StartByte && b.EndByte <= a.EndByte)
 }
