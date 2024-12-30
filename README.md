@@ -1,6 +1,6 @@
 [![Test](https://github.com/laravel-ls/laravel-ls/actions/workflows/test.yml/badge.svg)](https://github.com/laravel-ls/laravel-ls/actions/workflows/test.yml)
 
-<h1>Laravel-ls</h1>
+<h1 align="center">Laravel-ls</h1>
 <p align="center">
     Laravel Language Server written in go.
     <br />
