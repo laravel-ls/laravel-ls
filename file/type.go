@@ -13,14 +13,16 @@ const (
 
 // Find the filetype based on filename
 func TypeByFilename(filename string) Type {
-	if strings.HasSuffix(filename, ".blade.php") {
-		return TypeBlade
+	lookup := map[string]Type{
+		".blade.php": TypeBlade,
+		".php":       TypePHP,
+		".env":       TypeEnv,
 	}
-	if strings.HasSuffix(filename, ".php") {
-		return TypePHP
-	}
-	if strings.HasSuffix(filename, ".env") {
-		return TypeEnv
+
+	for ext, typ := range lookup {
+		if strings.HasSuffix(filename, ext) {
+			return typ
+		}
 	}
 	return TypeUnknown
 }
