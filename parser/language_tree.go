@@ -6,6 +6,7 @@ import (
 	"laravel-ls/treesitter"
 	"laravel-ls/treesitter/debug"
 	"laravel-ls/treesitter/injections"
+
 	"github.com/sirupsen/logrus"
 	ts "github.com/tree-sitter/go-tree-sitter"
 )

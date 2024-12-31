@@ -6,6 +6,7 @@ import (
 	"laravel-ls/file"
 	"laravel-ls/parser"
 	"laravel-ls/parser/env"
+
 	"github.com/stretchr/testify/require"
 )
 
