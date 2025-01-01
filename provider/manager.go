@@ -67,18 +67,18 @@ func (m *Manager) Register(typ file.Type, provider any) {
 	m.languages[typ] = lang
 }
 
-func (w *Manager) Completion(ctx CompletionContext) {
-	if providers, ok := w.languages[ctx.File.Type]; ok {
+func (m *Manager) Completion(ctx CompletionContext) {
+	if providers, ok := m.languages[ctx.File.Type]; ok {
 		for _, provider := range providers.CompletionProviders {
 			provider.ResolveCompletion(ctx)
 		}
 	}
 }
 
-func (w *Manager) Diagnostics(file *parser.File) []Diagnostic {
+func (m *Manager) Diagnostics(file *parser.File) []Diagnostic {
 	result := []Diagnostic{}
 
-	if providers, ok := w.languages[file.Type]; ok {
+	if providers, ok := m.languages[file.Type]; ok {
 		context := DiagnosticContext{
 			BaseContext: BaseContext{
 				Logger: logrus.WithField("module", "diagnostic"),
@@ -97,16 +97,16 @@ func (w *Manager) Diagnostics(file *parser.File) []Diagnostic {
 	return result
 }
 
-func (w *Manager) ResolveDefinition(context DefinitionContext) {
-	if providers, ok := w.languages[context.File.Type]; ok {
+func (m *Manager) ResolveDefinition(context DefinitionContext) {
+	if providers, ok := m.languages[context.File.Type]; ok {
 		for _, provider := range providers.DefinitionProviders {
 			provider.ResolveDefinition(context)
 		}
 	}
 }
 
-func (w *Manager) Hover(context HoverContext) string {
-	if providers, ok := w.languages[context.File.Type]; ok {
+func (m *Manager) Hover(context HoverContext) string {
+	if providers, ok := m.languages[context.File.Type]; ok {
 		for _, provider := range providers.HoverProviders {
 			if content := provider.Hover(context); len(content) > 0 {
 				return content
