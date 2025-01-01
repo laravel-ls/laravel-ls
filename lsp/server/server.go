@@ -19,9 +19,9 @@ import (
 )
 
 var (
-	ErrNonLocalPath             = errors.New("server only support local filesystem paths.")
-	ErrFileNotOpened            = errors.New("File not opened")
-	ErrFailedToGetPointAtCursor = errors.New("Failed to get node at cursor")
+	ErrNonLocalPath             = errors.New("server only support local filesystem paths")
+	ErrFileNotOpened            = errors.New("file not opened")
+	ErrFailedToGetPointAtCursor = errors.New("failed to get node at cursor")
 )
 
 type Server struct {
@@ -211,7 +211,7 @@ func (s Server) HandleTextDocumentDidChange(params protocol.DidChangeTextDocumen
 
 	file := s.cache.Get(filename)
 	if file == nil {
-		return fmt.Errorf("Failed to get state of file")
+		return ErrFileNotOpened
 	}
 
 	var errs error = nil
@@ -255,7 +255,7 @@ func (s Server) HandleTextDocumentDidClose(params protocol.DidCloseTextDocumentP
 func (s *Server) HandleInitialize(params protocol.InitializeParams) (protocol.InitializeResult, error) {
 	rootPath, found := strings.CutPrefix(params.RootURI, "file://")
 	if !found {
-		return protocol.InitializeResult{}, fmt.Errorf("server only support local filesystem root paths.")
+		return protocol.InitializeResult{}, fmt.Errorf("server only support local filesystem root paths")
 	}
 
 	log.WithField("method", protocol.MethodInitialize).
@@ -362,7 +362,7 @@ func (s Server) Run(ctx context.Context, conn io.ReadWriteCloser) error {
 
 	select {
 	case <-ctx.Done():
-		return fmt.Errorf("Context closed")
+		return fmt.Errorf("context closed")
 	case <-rpc.DisconnectNotify():
 		return nil
 	}
