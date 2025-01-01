@@ -1,0 +1,7 @@
+linters:
+  enable:
+    - gofumpt
+
+linters-settings:
+  gofumpt:
+    module-path: laravel-ls
