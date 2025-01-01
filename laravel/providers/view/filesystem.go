@@ -17,7 +17,7 @@ type filesystem struct {
 	paths []string
 }
 
-func (filesystem *filesystem) findInDir(basePath, dir string) ([]laravel.ViewFile, error) {
+func (filesystem filesystem) findInDir(basePath, dir string) ([]laravel.ViewFile, error) {
 	files := []laravel.ViewFile{}
 
 	root := path.Join(basePath, dir)
@@ -38,7 +38,7 @@ func (filesystem *filesystem) findInDir(basePath, dir string) ([]laravel.ViewFil
 }
 
 // Returns the directory where the file was found.
-func (filesystem *filesystem) findDir(basePath, filename string) (string, bool) {
+func (filesystem filesystem) findDir(basePath, filename string) (string, bool) {
 	for _, currentPath := range filesystem.paths {
 		fs, err := os.Stat(path.Join(basePath, currentPath, filename))
 		if err == nil && !fs.IsDir() {
@@ -49,7 +49,7 @@ func (filesystem *filesystem) findDir(basePath, filename string) (string, bool) 
 }
 
 // Find a file in any of the directories.
-func (filesystem *filesystem) find(basePath, filename string) (string, bool) {
+func (filesystem filesystem) find(basePath, filename string) (string, bool) {
 	for _, currentPath := range filesystem.paths {
 		fullPath := path.Join(basePath, currentPath, filename)
 		fs, err := os.Stat(fullPath)
@@ -60,7 +60,7 @@ func (filesystem *filesystem) find(basePath, filename string) (string, bool) {
 	return "", false
 }
 
-func (filesystem *filesystem) search(basePath, search string) ([]laravel.ViewFile, error) {
+func (filesystem filesystem) search(basePath, search string) ([]laravel.ViewFile, error) {
 	files := []laravel.ViewFile{}
 	for _, currentPath := range filesystem.paths {
 		filesInDir, err := filesystem.findInDir(basePath, currentPath)
@@ -80,7 +80,7 @@ func (filesystem *filesystem) search(basePath, search string) ([]laravel.ViewFil
 }
 
 // Find a view file on the filesystem
-func (filesystem *filesystem) findView(basePath, name string) (laravel.ViewFile, bool) {
+func (filesystem filesystem) findView(basePath, name string) (laravel.ViewFile, bool) {
 	viewFile := laravel.ViewFromName(name)
 	if dir, ok := filesystem.findDir(basePath, viewFile.Filename()); ok {
 		return laravel.ViewFromPath(dir, viewFile.Filename()), true
@@ -88,7 +88,7 @@ func (filesystem *filesystem) findView(basePath, name string) (laravel.ViewFile,
 	return laravel.ViewFile{}, false
 }
 
-func (filesystem *filesystem) exists(basepath, name string) bool {
+func (filesystem filesystem) exists(basepath, name string) bool {
 	_, found := filesystem.findView(basepath, name)
 	return found
 }
