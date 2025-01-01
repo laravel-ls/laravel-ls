@@ -38,10 +38,11 @@ func (s *FileCache) Open(filename string) (*parser.File, error) {
 		return nil, err
 	}
 
-	parseFile := parser.Parse(content, lang)
-	s.files[filename] = parseFile
-
-	return parseFile, nil
+	parseFile, err := parser.Parse(content, lang)
+	if err == nil {
+		s.files[filename] = parseFile
+	}
+	return parseFile, err
 }
 
 func (s *FileCache) read(filename string) ([]byte, error) {

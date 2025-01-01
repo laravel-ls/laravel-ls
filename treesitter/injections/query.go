@@ -53,10 +53,8 @@ func getInfo(query *ts.Query, patterIndex uint) (string, bool) {
 		switch prop.Key {
 		case "injection.language":
 			lang = *prop.Value
-			break
 		case "injection.combined":
 			combined = true
-			break
 		}
 	}
 	return lang, combined

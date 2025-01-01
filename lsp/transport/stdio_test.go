@@ -11,9 +11,9 @@ import (
 
 func Test_Read(t *testing.T) {
 	r, w, err := os.Pipe()
+	assert.NoError(t, err)
 	defer r.Close()
 	defer w.Close()
-	assert.NoError(t, err)
 
 	os.Stdin = r
 
@@ -32,9 +32,9 @@ func Test_Read(t *testing.T) {
 
 func Test_Write(t *testing.T) {
 	r, w, err := os.Pipe()
+	assert.NoError(t, err)
 	defer r.Close()
 	defer w.Close()
-	assert.NoError(t, err)
 
 	os.Stdout = w
 

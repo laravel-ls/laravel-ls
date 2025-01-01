@@ -5,6 +5,7 @@ import (
 
 	"laravel-ls/parser"
 	"laravel-ls/treesitter"
+
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
 
@@ -38,10 +39,8 @@ func (s *State) parseString(node *ts.Node) (string, error) {
 		switch node.Kind() {
 		case "variable":
 			value += s.resolveVariable(node)
-			break
 		default:
 			value += node.Utf8Text(s.file.Src)
-			break
 		}
 	}
 	return value, nil

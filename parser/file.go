@@ -17,20 +17,23 @@ type File struct {
 	Src utils.Buffer
 }
 
-func Parse(content []byte, typ file.Type) *File {
+func Parse(content []byte, typ file.Type) (*File, error) {
+	langTree, err := newLanguageTree(treesitter.FiletypeToLanguage(typ), []ts.Range{}, []*LanguageTree{})
+	if err != nil {
+		return nil, err
+	}
+
 	file := &File{
 		Type: typ,
-		Tree: newLanguageTree(treesitter.FiletypeToLanguage(typ), []ts.Range{}, []*LanguageTree{}),
+		Tree: langTree,
 	}
-	file.SetContent(content)
-	return file
+	return file, file.SetContent(content)
 }
 
 // Set the file contents.
-func (f *File) SetContent(src []byte) {
+func (f *File) SetContent(src []byte) error {
 	f.Src = src
-
-	f.Tree.parse(f.Src)
+	return f.Tree.parse(f.Src)
 }
 
 // Update part of file contents

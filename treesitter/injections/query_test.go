@@ -5,6 +5,7 @@ import (
 
 	"laravel-ls/treesitter"
 	"laravel-ls/treesitter/injections"
+
 	"github.com/stretchr/testify/assert"
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
@@ -18,7 +19,7 @@ func TestQuery(t *testing.T) {
 	lang := treesitter.GetLanguage(treesitter.LanguagePhp)
 
 	parser := ts.NewParser()
-	parser.SetLanguage(lang)
+	assert.NoError(t, parser.SetLanguage(lang))
 	tree := parser.Parse(src, nil)
 
 	query, err := ts.NewQuery(lang, injections.GetQuery(treesitter.LanguagePhp))
@@ -72,7 +73,7 @@ func TestQuery_Blade(t *testing.T) {
 	lang := treesitter.GetLanguage(treesitter.LanguageBlade)
 
 	parser := ts.NewParser()
-	parser.SetLanguage(lang)
+	assert.NoError(t, parser.SetLanguage(lang))
 	tree := parser.Parse(src, nil)
 
 	query, err := ts.NewQuery(lang, injections.GetQuery(treesitter.LanguageBlade))

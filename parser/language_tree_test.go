@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"laravel-ls/treesitter"
+
 	"github.com/stretchr/testify/assert"
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
@@ -14,9 +15,9 @@ func TestLanguageTree_Parse(t *testing.T) {
 	<?php $var = 2; ?>
 </div>`)
 
-	tree := newLanguageTree(treesitter.LanguagePhp, []ts.Range{}, []*LanguageTree{})
-	err := tree.parse(src)
+	tree, err := newLanguageTree(treesitter.LanguagePhp, []ts.Range{}, []*LanguageTree{})
 	assert.NoError(t, err)
+	assert.NoError(t, tree.parse(src))
 
 	assert.Len(t, tree.childTrees, 1)
 
@@ -32,9 +33,9 @@ func TestLanguageTree_UpdateThatRemovesInjectionRegion(t *testing.T) {
 
 	changedSrc := []byte(`<?php $var = 2; ?>`)
 
-	tree := newLanguageTree(treesitter.LanguagePhp, []ts.Range{}, []*LanguageTree{})
-	err := tree.parse(src)
+	tree, err := newLanguageTree(treesitter.LanguagePhp, []ts.Range{}, []*LanguageTree{})
 	assert.NoError(t, err)
+	assert.NoError(t, tree.parse(src))
 
 	assert.Len(t, tree.childTrees, 1)
 
@@ -78,7 +79,7 @@ func TestLanguageTree_UpdateThatRemovesInjectionRegion(t *testing.T) {
 		},
 	})
 
-	tree.parse(changedSrc)
+	err = tree.parse(changedSrc)
 	assert.NoError(t, err)
 
 	assert.Len(t, tree.childTrees, 0)

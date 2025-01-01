@@ -2,6 +2,7 @@ package server
 
 import (
 	"laravel-ls/lsp/protocol"
+
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
 

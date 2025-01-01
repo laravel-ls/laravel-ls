@@ -19,16 +19,19 @@ type LanguageTree struct {
 	childTrees []*LanguageTree
 }
 
-func newLanguageTree(language string, ranges []ts.Range, childTrees []*LanguageTree) *LanguageTree {
+func newLanguageTree(language string, ranges []ts.Range, childTrees []*LanguageTree) (*LanguageTree, error) {
 	parser := ts.NewParser()
-	parser.SetLanguage(treesitter.GetLanguage(language))
+	err := parser.SetLanguage(treesitter.GetLanguage(language))
+	if err != nil {
+		return nil, err
+	}
 
 	return &LanguageTree{
 		parser:     parser,
 		ranges:     ranges,
 		language:   language,
 		childTrees: childTrees,
-	}
+	}, nil
 }
 
 func (t *LanguageTree) Root() *ts.Node {
@@ -55,7 +58,11 @@ func (t *LanguageTree) update(edit *ts.InputEdit) {
 
 func (t *LanguageTree) parse(source []byte) error {
 	// Parse main tree first.
-	t.parser.SetIncludedRanges(t.ranges)
+	err := t.parser.SetIncludedRanges(t.ranges)
+	if err != nil {
+		return err
+	}
+
 	t.tree = t.parser.Parse(source, t.tree)
 
 	// Then parse any injections
@@ -84,7 +91,13 @@ func (t *LanguageTree) parseInjections(source []byte) error {
 				continue
 			}
 		}
-		childTrees = append(childTrees, newLanguageTree(injection.Language, []ts.Range{injection.Range}, []*LanguageTree{}))
+
+		tree, err := newLanguageTree(injection.Language, []ts.Range{injection.Range}, []*LanguageTree{})
+		if err != nil {
+			return err
+		}
+
+		childTrees = append(childTrees, tree)
 	}
 
 	// Parse all children

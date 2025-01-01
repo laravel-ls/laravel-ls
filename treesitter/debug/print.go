@@ -20,7 +20,7 @@ func (p Print) Inner(node *ts.Node, depth uint) string {
 
 	for i := uint(0); i < node.ChildCount(); i++ {
 		child := node.Child(i)
-		if p.AnonNodes == false && child.IsNamed() == false {
+		if !p.AnonNodes && !child.IsNamed() {
 			continue
 		}
 		ret += p.Inner(node, depth+1)

@@ -33,7 +33,8 @@ MAIL_FROM_NAME="${APP_NAME}"`)
 		"MAIL_FROM_NAME":    {Value: "${APP_NAME}", Line: 9, Column: 15},
 	}
 
-	pFile := parser.Parse(src, file.TypeEnv)
+	pFile, err := parser.Parse(src, file.TypeEnv)
+	require.NoError(t, err)
 	actual, err := env.Parse(pFile)
 	require.NoError(t, err)
 	require.Equal(t, expected, actual)
@@ -65,7 +66,8 @@ MAIL_FROM_NAME="xxx ${MAIL_ENCRYPTION} yyy"`)
 		"MAIL_FROM_NAME":    {Value: "xxx encrypt:some_name yyy", Line: 11, Column: 15},
 	}
 
-	pFile := parser.Parse(src, file.TypeEnv)
+	pFile, err := parser.Parse(src, file.TypeEnv)
+	require.NoError(t, err)
 	actual, err := env.Parse(pFile)
 	require.NoError(t, err)
 	require.Equal(t, expected, actual)
@@ -81,7 +83,8 @@ APP_NAME=some_name`)
 		"APP_NAME":       {Value: "some_name", Line: 2, Column: 9},
 	}
 
-	pFile := parser.Parse(src, file.TypeEnv)
+	pFile, err := parser.Parse(src, file.TypeEnv)
+	require.NoError(t, err)
 	actual, err := env.Parse(pFile)
 	require.NoError(t, err)
 	require.Equal(t, expected, actual)
