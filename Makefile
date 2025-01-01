@@ -10,5 +10,8 @@ build:
 	mkdir -p build
 	$(GO) build $(GOBUILDFLAGS) -o ./build/laravel-ls ./cmd/laravel-ls
 
+lint:
+	golangci-lint run ./...
+
 test:
 	$(GO) test -v ./...
