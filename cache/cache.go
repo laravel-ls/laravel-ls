@@ -30,7 +30,7 @@ func (s *FileCache) Open(filename string) (*parser.File, error) {
 
 	lang := file.TypeByFilename(filename)
 	if lang == file.TypeUnknown {
-		return nil, errors.New("Language not supported")
+		return nil, errors.New("language not supported")
 	}
 
 	content, err := s.read(filename)
@@ -67,7 +67,7 @@ func (s *FileCache) Close(filename string) error {
 		delete(s.files, filename)
 		return nil
 	}
-	return fmt.Errorf("File '%s' is not open", filename)
+	return fmt.Errorf("file '%s' is not open", filename)
 }
 
 func (s *FileCache) IsOpen(filename string) bool {
