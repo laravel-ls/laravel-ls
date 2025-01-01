@@ -1,7 +1,13 @@
 linters:
   enable:
+    - stylecheck
     - gofumpt
 
 linters-settings:
   gofumpt:
     module-path: laravel-ls
+  stylecheck:
+    checks:
+      - "ST1005"
+      - "ST1016"
+
