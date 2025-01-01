@@ -13,7 +13,6 @@ import (
 	"laravel-ls/lsp/protocol"
 	"laravel-ls/provider"
 
-	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"github.com/sourcegraph/jsonrpc2"
 )
@@ -65,7 +64,7 @@ func (s *Server) HandleTextDocumentCompletion(params protocol.CompletionParams) 
 
 	context := provider.CompletionContext{
 		BaseContext: provider.BaseContext{
-			Logger: logrus.WithField("module", "Definition"),
+			Logger: log.WithField("module", "Definition"),
 			File:   file,
 		},
 		Position: toTSPoint(params.Position),
@@ -95,7 +94,7 @@ func (s *Server) HandleTextDocumentHover(params protocol.HoverParams) (protocol.
 
 	context := provider.HoverContext{
 		BaseContext: provider.BaseContext{
-			Logger: logrus.WithField("module", "Definition"),
+			Logger: log.WithField("module", "Definition"),
 			File:   file,
 		},
 		Position: toTSPoint(params.Position),
@@ -164,7 +163,7 @@ func (s *Server) HandleTextDocumentDefinition(params protocol.DefinitionParams) 
 		return response, ErrFileNotOpened
 	}
 
-	logger := logrus.WithField("module", "Definition")
+	logger := log.WithField("module", "Definition")
 
 	context := provider.DefinitionContext{
 		BaseContext: provider.BaseContext{
@@ -263,7 +262,7 @@ func (s *Server) HandleInitialize(params protocol.InitializeParams) (protocol.In
 		Info("Initialized")
 
 	s.providerManager.Init(provider.InitContext{
-		Logger:    logrus.WithField("module", "Initialize"),
+		Logger:    log.WithField("module", "Initialize"),
 		RootPath:  rootPath,
 		FileCache: s.cache,
 	})
