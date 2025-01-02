@@ -6,10 +6,9 @@ import (
 
 // Returns true if point p is inside range r
 func PointInRange(p ts.Point, r ts.Range) bool {
-	if r.StartPoint.Row == r.EndPoint.Row {
-		return p.Row == r.StartPoint.Row && p.Column >= r.StartPoint.Column && p.Column <= r.EndPoint.Column
-	}
-	return p.Row >= r.StartPoint.Row && p.Row <= r.EndPoint.Row
+	return (p.Row == r.StartPoint.Row && p.Column >= r.StartPoint.Column) ||
+		(p.Row == r.EndPoint.Row && p.Column <= r.EndPoint.Column) ||
+		(p.Row > r.StartPoint.Row && p.Row < r.EndPoint.Row)
 }
 
 // Returns true if range a and b overlaps.
