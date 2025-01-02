@@ -25,7 +25,7 @@ func CalculateEdit(start, end ts.Point, oldSrc []byte, newSrc []byte) *ts.InputE
 func GetRowByte(row uint, src []byte) uint {
 	current := uint(0)
 
-	// Find the start of the row by iterating through the newlines
+	// Find the start of the row by iterating through newlines
 	for i, b := range src {
 		if b == '\n' {
 			current++
