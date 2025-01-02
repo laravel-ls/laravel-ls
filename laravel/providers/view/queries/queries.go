@@ -35,7 +35,7 @@ func ViewNames(file *parser.File) []parser.Capture {
 }
 
 func GetViewName(node *ts.Node, source []byte) string {
-	if node.Kind() == "string" && node.NamedChildCount() > 0 {
+	if (node.Kind() == "string" || node.Kind() == "encapsed_string") && node.NamedChildCount() > 0 {
 		contentNode := node.NamedChild(0)
 		if contentNode.Kind() == "string_content" {
 			return contentNode.Utf8Text(source)
