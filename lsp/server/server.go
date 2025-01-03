@@ -94,8 +94,9 @@ func (s *Server) HandleTextDocumentHover(params protocol.HoverParams) (protocol.
 
 	context := provider.HoverContext{
 		BaseContext: provider.BaseContext{
-			Logger: log.WithField("module", "Definition"),
-			File:   file,
+			Logger:    log.WithField("module", "Definition"),
+			File:      file,
+			FileCache: s.cache,
 		},
 		Position: toTSPoint(params.Position),
 	}
