@@ -105,13 +105,10 @@ func (m *Manager) ResolveDefinition(context DefinitionContext) {
 	}
 }
 
-func (m *Manager) Hover(context HoverContext) string {
+func (m *Manager) Hover(context HoverContext) {
 	if providers, ok := m.languages[context.File.Type]; ok {
 		for _, provider := range providers.HoverProviders {
-			if content := provider.Hover(context); len(content) > 0 {
-				return content
-			}
+			provider.Hover(context)
 		}
 	}
-	return ""
 }

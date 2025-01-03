@@ -93,16 +93,20 @@ func (s *Server) HandleTextDocumentHover(params protocol.HoverParams) (protocol.
 
 	file := s.cache.Get(filename)
 
-	context := provider.HoverContext{
+	content := ""
+
+	s.providerManager.Hover(provider.HoverContext{
 		BaseContext: provider.BaseContext{
 			Logger:    log.WithField("module", "Definition"),
 			File:      file,
 			FileCache: s.cache,
 		},
 		Position: toTSPoint(params.Position),
-	}
+		Publish: func(result provider.Hover) {
+			content += result.Content
+		},
+	})
 
-	content := s.providerManager.Hover(context)
 	if len(content) > 0 {
 		response.Contents.MarkupContent = &protocol.MarkupContent{
 			Kind:  "markup",

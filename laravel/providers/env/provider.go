@@ -43,17 +43,22 @@ func (p *Provider) Hover(ctx provider.HoverContext) string {
 	if node != nil {
 		key := queries.GetKey(node, ctx.File.Src)
 		if len(key) < 1 {
-			return ""
+			return
 		}
 
 		if meta, found := p.repo.Get(key); found {
+			var content string
 			if len(meta.Value) < 1 {
-				return "[empty]"
+				content = "[empty]"
+			} else {
+				content = meta.Value
 			}
-			return meta.Value
+
+			ctx.Publish(provider.Hover{
+				Content: content,
+			})
 		}
 	}
-	return ""
 }
 
 // resolve env() calls to variable

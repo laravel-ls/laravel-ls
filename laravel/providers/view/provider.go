@@ -103,18 +103,19 @@ func (p *Provider) Diagnostic(ctx provider.DiagnosticContext) {
 	}
 }
 
-func (p *Provider) Hover(ctx provider.HoverContext) string {
+func (p *Provider) Hover(ctx provider.HoverContext) {
 	node := queries.ViewNameAtPosition(ctx.File, ctx.Position)
 
 	if node != nil {
 		name := queries.GetViewName(node, ctx.File.Src)
 		if len(name) < 1 {
-			return ""
+			return
 		}
 
 		if view, found := p.fs.findView(p.rootPath, name); found {
-			return view.Path()
+			ctx.Publish(provider.Hover{
+				Content: view.Path(),
+			})
 		}
 	}
-	return ""
 }
