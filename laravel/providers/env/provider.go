@@ -59,18 +59,18 @@ func (p *Provider) Hover(ctx provider.HoverContext) {
 			return
 		}
 
+		content := "[undefined]"
 		if meta, found := p.repo.Get(key); found {
-			var content string
 			if len(meta.Value) < 1 {
 				content = "[empty]"
 			} else {
 				content = meta.Value
 			}
-
-			ctx.Publish(provider.Hover{
-				Content: content,
-			})
 		}
+
+		ctx.Publish(provider.Hover{
+			Content: content,
+		})
 	}
 }
 
