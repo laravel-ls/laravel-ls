@@ -38,3 +38,13 @@ func GetKey(node *ts.Node, source []byte) string {
 	}
 	return ""
 }
+
+// Check if a env call has a default value.
+func HasDefault(node *ts.Node) bool {
+	parent := node.Parent()
+
+	if parent != nil && parent.Kind() == "argument" {
+		return parent.NextNamedSibling() != nil
+	}
+	return false
+}
