@@ -15,8 +15,12 @@ func TestPointInRange(t *testing.T) {
 		r     ts.Range
 		wants bool
 	}{
+		{ts.Point{Row: 2, Column: 4}, ts.Range{StartByte: 0, EndByte: 0, StartPoint: ts.Point{Row: 2, Column: 4}, EndPoint: ts.Point{Row: 2, Column: 10}}, true},
+		{ts.Point{Row: 2, Column: 9}, ts.Range{StartByte: 0, EndByte: 0, StartPoint: ts.Point{Row: 2, Column: 4}, EndPoint: ts.Point{Row: 2, Column: 10}}, true},
 		{ts.Point{Row: 2, Column: 4}, ts.Range{StartByte: 0, EndByte: 0, StartPoint: ts.Point{Row: 2, Column: 4}, EndPoint: ts.Point{Row: 3, Column: 5}}, true},
 		{ts.Point{Row: 3, Column: 39}, ts.Range{StartByte: 0, EndByte: 0, StartPoint: ts.Point{Row: 2, Column: 4}, EndPoint: ts.Point{Row: 4, Column: 1}}, true},
+		{ts.Point{Row: 2, Column: 4}, ts.Range{StartByte: 0, EndByte: 0, StartPoint: ts.Point{Row: 2, Column: 6}, EndPoint: ts.Point{Row: 2, Column: 10}}, false},
+		{ts.Point{Row: 2, Column: 12}, ts.Range{StartByte: 0, EndByte: 0, StartPoint: ts.Point{Row: 2, Column: 6}, EndPoint: ts.Point{Row: 2, Column: 10}}, false},
 		{ts.Point{Row: 2, Column: 4}, ts.Range{StartByte: 0, EndByte: 0, StartPoint: ts.Point{Row: 2, Column: 6}, EndPoint: ts.Point{Row: 3, Column: 5}}, false},
 		{ts.Point{Row: 2, Column: 4}, ts.Range{StartByte: 0, EndByte: 0, StartPoint: ts.Point{Row: 3, Column: 0}, EndPoint: ts.Point{Row: 3, Column: 5}}, false},
 		{ts.Point{Row: 13, Column: 29}, ts.Range{StartByte: 0, EndByte: 0, StartPoint: ts.Point{Row: 10, Column: 0}, EndPoint: ts.Point{Row: 12, Column: 39}}, false},
