@@ -18,7 +18,7 @@ type File struct {
 }
 
 func Parse(content []byte, typ file.Type) (*File, error) {
-	langTree, err := newLanguageTree(treesitter.FiletypeToLanguage(typ), []ts.Range{}, []*LanguageTree{})
+	langTree, err := newLanguageTree(treesitter.FiletypeToLanguage(typ), []ts.Range{})
 	if err != nil {
 		return nil, err
 	}

@@ -19,7 +19,7 @@ type LanguageTree struct {
 	childTrees []*LanguageTree
 }
 
-func newLanguageTree(language string, ranges []ts.Range, childTrees []*LanguageTree) (*LanguageTree, error) {
+func newLanguageTree(language string, ranges []ts.Range) (*LanguageTree, error) {
 	parser := ts.NewParser()
 	err := parser.SetLanguage(treesitter.GetLanguage(language))
 	if err != nil {
@@ -30,7 +30,7 @@ func newLanguageTree(language string, ranges []ts.Range, childTrees []*LanguageT
 		parser:     parser,
 		ranges:     ranges,
 		language:   language,
-		childTrees: childTrees,
+		childTrees: []*LanguageTree{},
 	}, nil
 }
 
@@ -92,7 +92,7 @@ func (t *LanguageTree) parseInjections(source []byte) error {
 			}
 		}
 
-		tree, err := newLanguageTree(injection.Language, []ts.Range{injection.Range}, []*LanguageTree{})
+		tree, err := newLanguageTree(injection.Language, []ts.Range{injection.Range})
 		if err != nil {
 			return err
 		}

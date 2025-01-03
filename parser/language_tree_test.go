@@ -15,7 +15,7 @@ func TestLanguageTree_Parse(t *testing.T) {
 	<?php $var = 2; ?>
 </div>`)
 
-	tree, err := newLanguageTree(treesitter.LanguagePhp, []ts.Range{}, []*LanguageTree{})
+	tree, err := newLanguageTree(treesitter.LanguagePhp, []ts.Range{})
 	assert.NoError(t, err)
 	assert.NoError(t, tree.parse(src))
 
@@ -33,7 +33,7 @@ func TestLanguageTree_UpdateThatRemovesInjectionRegion(t *testing.T) {
 
 	changedSrc := []byte(`<?php $var = 2; ?>`)
 
-	tree, err := newLanguageTree(treesitter.LanguagePhp, []ts.Range{}, []*LanguageTree{})
+	tree, err := newLanguageTree(treesitter.LanguagePhp, []ts.Range{})
 	assert.NoError(t, err)
 	assert.NoError(t, tree.parse(src))
 
