@@ -37,7 +37,7 @@ func (p *Provider) Init(ctx provider.InitContext) {
 	}
 }
 
-func (p *Provider) Hover(ctx provider.HoverContext) string {
+func (p *Provider) Hover(ctx provider.HoverContext) {
 	node := queries.EnvCallAtPosition(ctx.File, ctx.Position)
 
 	if node != nil {
