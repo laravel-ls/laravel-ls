@@ -129,8 +129,9 @@ func (p *Provider) Diagnostic(ctx provider.DiagnosticContext) {
 		for _, capture := range captures {
 			key := queries.GetKey(&capture.Node, ctx.File.Src)
 
-			// Report diagnostic if key is not defined.
-			if !p.repo.Exists(key) {
+			// Report diagnostic if key is not defined
+			// and no default value is given
+			if !p.repo.Exists(key) && !queries.HasDefault(&capture.Node) {
 				ctx.Publish(provider.Diagnostic{
 					Range:    capture.Node.Range(),
 					Severity: protocol.SeverityError,
