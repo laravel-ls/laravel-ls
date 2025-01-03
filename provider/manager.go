@@ -2,9 +2,6 @@ package provider
 
 import (
 	"laravel-ls/file"
-	"laravel-ls/parser"
-
-	"github.com/sirupsen/logrus"
 )
 
 type Language struct {
@@ -75,26 +72,12 @@ func (m *Manager) Completion(ctx CompletionContext) {
 	}
 }
 
-func (m *Manager) Diagnostics(file *parser.File) []Diagnostic {
-	result := []Diagnostic{}
-
-	if providers, ok := m.languages[file.Type]; ok {
-		context := DiagnosticContext{
-			BaseContext: BaseContext{
-				Logger: logrus.WithField("module", "diagnostic"),
-				File:   file,
-			},
-			Publish: func(diagnostic Diagnostic) {
-				result = append(result, diagnostic)
-			},
-		}
-
+func (m *Manager) Diagnostics(ctx DiagnosticContext) {
+	if providers, ok := m.languages[ctx.File.Type]; ok {
 		for _, provider := range providers.DiagnosticsProviders {
-			provider.Diagnostic(context)
+			provider.Diagnostic(ctx)
 		}
 	}
-
-	return result
 }
 
 func (m *Manager) ResolveDefinition(context DefinitionContext) {

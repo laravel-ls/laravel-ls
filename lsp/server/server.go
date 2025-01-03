@@ -132,21 +132,27 @@ func (s *Server) HandleTextDocumentDiagnostic(params protocol.DocumentDiagnostic
 	}
 
 	items := []protocol.Diagnostic{}
-	for _, diagnostic := range s.providerManager.Diagnostics(file) {
 
-		start := diagnostic.Range.StartPoint
-		end := diagnostic.Range.EndPoint
+	s.providerManager.Diagnostics(provider.DiagnosticContext{
+		BaseContext: provider.BaseContext{
+			Logger: log.WithField("module", "diagnostic"),
+			File:   file,
+		},
+		Publish: func(diagnostic provider.Diagnostic) {
+			start := diagnostic.Range.StartPoint
+			end := diagnostic.Range.EndPoint
 
-		items = append(items, protocol.Diagnostic{
-			Range: protocol.Range{
-				Start: FromTSPoint(start),
-				End:   FromTSPoint(end),
-			},
-			Severity: protocol.DiagnosticSeverity(diagnostic.Severity),
-			Source:   laravel_ls.Name,
-			Message:  diagnostic.Message,
-		})
-	}
+			items = append(items, protocol.Diagnostic{
+				Range: protocol.Range{
+					Start: FromTSPoint(start),
+					End:   FromTSPoint(end),
+				},
+				Severity: protocol.DiagnosticSeverity(diagnostic.Severity),
+				Source:   laravel_ls.Name,
+				Message:  diagnostic.Message,
+			})
+		},
+	})
 
 	return &protocol.FullDocumentDiagnosticReport{
 		Kind:  "full",
