@@ -64,8 +64,9 @@ func (s *Server) HandleTextDocumentCompletion(params protocol.CompletionParams) 
 
 	context := provider.CompletionContext{
 		BaseContext: provider.BaseContext{
-			Logger: log.WithField("module", "Definition"),
-			File:   file,
+			Logger:    log.WithField("module", "Definition"),
+			File:      file,
+			FileCache: s.cache,
 		},
 		Position: toTSPoint(params.Position),
 		Publish: func(item protocol.CompletionItem) {
