@@ -135,8 +135,9 @@ func (s *Server) HandleTextDocumentDiagnostic(params protocol.DocumentDiagnostic
 
 	s.providerManager.Diagnostics(provider.DiagnosticContext{
 		BaseContext: provider.BaseContext{
-			Logger: log.WithField("module", "diagnostic"),
-			File:   file,
+			Logger:    log.WithField("module", "diagnostic"),
+			File:      file,
+			FileCache: s.cache,
 		},
 		Publish: func(diagnostic provider.Diagnostic) {
 			start := diagnostic.Range.StartPoint
