@@ -55,7 +55,7 @@ func (s *FileCache) read(filename string) ([]byte, error) {
 	return io.ReadAll(fd)
 }
 
-func (s *FileCache) Get(filename string) *parser.File {
+func (s FileCache) Get(filename string) *parser.File {
 	if file, ok := s.files[filename]; ok {
 		return file
 	}
@@ -70,7 +70,7 @@ func (s *FileCache) Close(filename string) error {
 	return fmt.Errorf("file '%s' is not open", filename)
 }
 
-func (s *FileCache) IsOpen(filename string) bool {
+func (s FileCache) IsOpen(filename string) bool {
 	_, ok := s.files[filename]
 	return ok
 }
