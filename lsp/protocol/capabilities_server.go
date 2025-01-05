@@ -22,6 +22,9 @@ type ServerCapabilities struct {
 
 	// The server has support for pull model diagnostics.
 	DiagnosticProvider interface{} `json:"diagnosticProvider,omitempty"`
+
+	// The server has support for code actions.
+	CodeActionProvider bool `json:"codeActionProvider,omitempty"`
 }
 
 // TextDocumentSyncKind defines how the host (editor) should sync document changes to the language server.

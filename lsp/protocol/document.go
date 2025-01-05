@@ -48,3 +48,12 @@ type TextEdit struct {
 	// NewText is the string to replace the range with.
 	NewText string `json:"newText"`
 }
+
+// TextDocumentEdit represents edits to a single text document.
+type TextDocumentEdit struct {
+	// TextDocument identifies the text document to change.
+	TextDocument VersionedTextDocumentIdentifier `json:"textDocument"`
+
+	// Edits is an array of edits to apply to the text document.
+	Edits []TextEdit `json:"edits"`
+}
