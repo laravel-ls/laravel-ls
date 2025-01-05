@@ -19,7 +19,7 @@ type DiagnosticContext struct {
 	Publish DiagnosticPublisher
 }
 
-// Interface that plugins that supports diagnostics can implement
+// Interface that providers that supports diagnostics can implement
 type DiagnosticProvider interface {
 	Diagnostic(DiagnosticContext)
 }

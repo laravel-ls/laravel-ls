@@ -17,7 +17,7 @@ type HoverContext struct {
 	Publish  HoverPublisher
 }
 
-// Interface that plugins that supports hover information can implement
+// Interface that providers that supports hover information can implement
 type HoverProvider interface {
 	Hover(HoverContext)
 }

@@ -17,7 +17,7 @@ type DefinitionContext struct {
 	Publish LocationPublisher
 }
 
-// Interface that plugins that supports go to definition can implement
+// Interface that providers that supports go to definition can implement
 type DefinitionProvider interface {
 	// Resolve go to definition
 	ResolveDefinition(DefinitionContext)

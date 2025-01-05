@@ -18,7 +18,7 @@ type CompletionContext struct {
 	Publish CompletionPublish
 }
 
-// Interface that supports completion can implement
+// Interface that providers that supports completion can implement
 type CompletionProvider interface {
 	// Resolve go to definition
 	ResolveCompletion(CompletionContext)
