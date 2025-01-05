@@ -1,6 +1,9 @@
 package file
 
-import "strings"
+import (
+	"path"
+	"strings"
+)
 
 type Type int
 
@@ -16,7 +19,6 @@ func TypeByFilename(filename string) Type {
 	lookup := map[string]Type{
 		".blade.php": TypeBlade,
 		".php":       TypePHP,
-		".env":       TypeEnv,
 	}
 
 	for ext, typ := range lookup {
@@ -24,5 +26,10 @@ func TypeByFilename(filename string) Type {
 			return typ
 		}
 	}
+
+	if strings.HasPrefix(path.Base(filename), ".env") {
+		return TypeEnv
+	}
+
 	return TypeUnknown
 }
