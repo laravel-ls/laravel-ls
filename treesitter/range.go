@@ -28,8 +28,13 @@ func PointInRange(p ts.Point, r ts.Range) bool {
 	return true
 }
 
-// Returns true if range a and b overlaps.
+// Returns true if range a and b overlaps. (calculated using point fields)
 func RangeOverlap(a ts.Range, b ts.Range) bool {
+	return PointInRange(a.StartPoint, b) || PointInRange(b.StartPoint, a)
+}
+
+// Returns true if range a and b overlaps (calculated using byte fields)
+func RangeOverlapBytes(a ts.Range, b ts.Range) bool {
 	return (a.StartByte >= b.StartByte && a.StartByte <= b.EndByte) ||
 		(b.StartByte >= a.StartByte && b.StartByte <= a.EndByte)
 }

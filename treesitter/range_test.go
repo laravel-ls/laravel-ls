@@ -37,6 +37,89 @@ func TestPointInRange(t *testing.T) {
 }
 
 func TestRangeOverlap(t *testing.T) {
+	r := func(s_row, s_col, e_row, e_col uint) ts.Range {
+		return ts.Range{
+			StartPoint: ts.Point{Row: s_row, Column: s_col},
+			EndPoint:   ts.Point{Row: e_row, Column: e_col},
+		}
+	}
+
+	tests := []struct {
+		name     string
+		a        ts.Range
+		b        ts.Range
+		expected bool
+	}{
+		// Overlapping cases
+		{
+			name:     "Fully overlapping ranges",
+			a:        r(1, 0, 2, 0),
+			b:        r(1, 5, 2, 5),
+			expected: true,
+		},
+		{
+			name:     "Partially overlapping ranges",
+			a:        r(1, 0, 3, 0),
+			b:        r(2, 0, 4, 0),
+			expected: true,
+		},
+		// Non-overlapping cases
+		{
+			name:     "Non-overlapping ranges (disjoint rows)",
+			a:        r(1, 0, 2, 0),
+			b:        r(3, 0, 4, 0),
+			expected: false,
+		},
+		{
+			name:     "Non-overlapping ranges (same row, disjoint columns)",
+			a:        r(1, 0, 1, 5),
+			b:        r(1, 6, 1, 10),
+			expected: false,
+		},
+		// Edge cases
+		{
+			name:     "Adjacent ranges (overlap)",
+			a:        r(1, 0, 1, 5),
+			b:        r(1, 5, 1, 10),
+			expected: true,
+		},
+		{
+			name:     "Adjacent ranges (non-overlap)",
+			a:        r(1, 0, 1, 5),
+			b:        r(1, 6, 1, 10),
+			expected: false,
+		},
+		{
+			name:     "Same range",
+			a:        r(1, 0, 2, 0),
+			b:        r(1, 0, 2, 0),
+			expected: true,
+		},
+		{
+			name:     "Single-point ranges (overlapping)",
+			a:        r(1, 0, 1, 0),
+			b:        r(1, 0, 1, 0),
+			expected: true,
+		},
+		{
+			name:     "Single-point ranges (non-overlapping)",
+			a:        r(1, 0, 1, 0),
+			b:        r(1, 1, 1, 1),
+			expected: false,
+		},
+	}
+
+	for _, args := range tests {
+		t.Run(args.name, func(t *testing.T) {
+			actual := treesitter.RangeOverlap(args.a, args.b)
+			if actual != args.expected {
+				t.Errorf("%t is not equal to %t", actual, args.expected)
+			}
+		})
+	}
+}
+
+func TestRangeOverlapBytes(t *testing.T) {
 	tests := []struct {
 		a     ts.Range
 		b     ts.Range
@@ -60,7 +143,7 @@ func TestRangeOverlap(t *testing.T) {
 
 	for i, args := range tests {
 		t.Run(fmt.Sprintf("#%d", i+1), func(t *testing.T) {
-			actual := treesitter.RangeOverlap(args.a, args.b)
+			actual := treesitter.RangeOverlapBytes(args.a, args.b)
 			if actual != args.wants {
 				t.Errorf("%t is not equal to %t", actual, args.wants)
 			}
