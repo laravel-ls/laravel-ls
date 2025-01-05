@@ -27,3 +27,10 @@ func FromTSPoint(point ts.Point) protocol.Position {
 		Character: int(point.Column),
 	}
 }
+
+func toTSRange(r protocol.Range) ts.Range {
+	return ts.Range{
+		StartPoint: toTSPoint(r.Start),
+		EndPoint:   toTSPoint(r.End),
+	}
+}
