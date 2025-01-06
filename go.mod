@@ -1,4 +1,4 @@
-module laravel-ls
+module github.com/laravel-ls/laravel-ls
 
 go 1.22.9
 
