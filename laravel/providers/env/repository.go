@@ -3,8 +3,8 @@ package env
 import (
 	"strings"
 
-	"laravel-ls/parser"
-	"laravel-ls/parser/env"
+	"github.com/laravel-ls/laravel-ls/parser"
+	"github.com/laravel-ls/laravel-ls/parser/env"
 )
 
 type Repository struct {

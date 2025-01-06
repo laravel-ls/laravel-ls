@@ -3,9 +3,9 @@ package env_test
 import (
 	"testing"
 
-	"laravel-ls/file"
-	"laravel-ls/parser"
-	"laravel-ls/parser/env"
+	"github.com/laravel-ls/laravel-ls/file"
+	"github.com/laravel-ls/laravel-ls/parser"
+	"github.com/laravel-ls/laravel-ls/parser/env"
 
 	"github.com/stretchr/testify/require"
 )

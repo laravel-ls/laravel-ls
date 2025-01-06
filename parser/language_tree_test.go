@@ -3,7 +3,7 @@ package parser
 import (
 	"testing"
 
-	"laravel-ls/treesitter"
+	"github.com/laravel-ls/laravel-ls/treesitter"
 
 	"github.com/stretchr/testify/assert"
 	ts "github.com/tree-sitter/go-tree-sitter"

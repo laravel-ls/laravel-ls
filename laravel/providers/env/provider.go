@@ -3,11 +3,11 @@ package env
 import (
 	"path"
 
-	"laravel-ls/cache"
-	"laravel-ls/file"
-	"laravel-ls/laravel/providers/env/queries"
-	"laravel-ls/lsp/protocol"
-	"laravel-ls/provider"
+	"github.com/laravel-ls/laravel-ls/cache"
+	"github.com/laravel-ls/laravel-ls/file"
+	"github.com/laravel-ls/laravel-ls/laravel/providers/env/queries"
+	"github.com/laravel-ls/laravel-ls/lsp/protocol"
+	"github.com/laravel-ls/laravel-ls/provider"
 
 	log "github.com/sirupsen/logrus"
 )

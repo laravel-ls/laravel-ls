@@ -3,11 +3,11 @@ package view
 import (
 	"path"
 
-	"laravel-ls/file"
-	"laravel-ls/laravel"
-	"laravel-ls/laravel/providers/view/queries"
-	"laravel-ls/lsp/protocol"
-	"laravel-ls/provider"
+	"github.com/laravel-ls/laravel-ls/file"
+	"github.com/laravel-ls/laravel-ls/laravel"
+	"github.com/laravel-ls/laravel-ls/laravel/providers/view/queries"
+	"github.com/laravel-ls/laravel-ls/lsp/protocol"
+	"github.com/laravel-ls/laravel-ls/provider"
 )
 
 type Provider struct {

@@ -6,8 +6,8 @@ import (
 	"io"
 	"os"
 
-	"laravel-ls/file"
-	"laravel-ls/parser"
+	"github.com/laravel-ls/laravel-ls/file"
+	"github.com/laravel-ls/laravel-ls/parser"
 )
 
 // FileCache holds information about open files in the workspace.

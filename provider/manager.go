@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"laravel-ls/file"
+	"github.com/laravel-ls/laravel-ls/file"
 )
 
 type Language struct {
