@@ -44,6 +44,7 @@ Route::view('/user/profile', 'user.profile')
 - [x] Auto-complete existing template names
 - [ ] Auto-complete for existing arguments present in the template
 - [x] Diagnostics for template files that do not exists
+- [ ] Code action to create view file that do not exists.
 
 ### Environment
 
@@ -70,6 +71,16 @@ Config::get('app.name')
 - [ ] Go to config file and value location from key
 - [ ] Diagnostics for non defined config keys.
 
+### Assets
+
+```php
+asset('main.css');
+```
+
+- [ ] Auto-completion
+- [ ] Go to asset file
+- [ ] Diagnostics for non existent assets
+
 ### Blade components
 
 ```html
@@ -81,6 +92,7 @@ Config::get('app.name')
 - [ ] Auto-complete existing components
 - [ ] Auto-complete arguments defined in the component
 - [ ] Diagnostics for components that do not exists.
+- [ ] Code action to create missing components
 
 ## Other features on the horizon
 
