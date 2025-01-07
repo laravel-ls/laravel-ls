@@ -125,7 +125,7 @@ func (t LanguageTree) GetLanguageTrees(language string) []*LanguageTree {
 	return results
 }
 
-func (t LanguageTree) FindCaptures(language, pattern string, source []byte, captures ...string) (CaptureSlice, error) {
+func (t LanguageTree) FindCaptures(language, pattern string, source []byte, captures ...string) (treesitter.CaptureSlice, error) {
 	query, err := ts.NewQuery(treesitter.GetLanguage(language), pattern)
 	if err != nil {
 		return nil, err
@@ -147,7 +147,7 @@ func (t LanguageTree) FindCaptures(language, pattern string, source []byte, capt
 	cursor := ts.NewQueryCursor()
 	defer cursor.Close()
 
-	results := []Capture{}
+	results := []treesitter.Capture{}
 	for _, tree := range t.GetLanguageTrees(language) {
 		matches := cursor.Matches(query, tree.Root(), source)
 		for it := matches.Next(); it != nil; it = matches.Next() {
@@ -157,7 +157,7 @@ func (t LanguageTree) FindCaptures(language, pattern string, source []byte, capt
 					continue
 				}
 
-				results = append(results, Capture{
+				results = append(results, treesitter.Capture{
 					Name: name,
 					Node: capture.Node,
 				})

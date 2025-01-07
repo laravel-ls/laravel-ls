@@ -19,7 +19,7 @@ func IsViewName(file *parser.File, node *ts.Node) bool {
 	return file.NodeMatchesCapture(treesitter.LanguagePhp, view_query, QUERY_CAPTURE_VIEW_NAME, node)
 }
 
-func ViewNames(file *parser.File) parser.CaptureSlice {
+func ViewNames(file *parser.File) treesitter.CaptureSlice {
 	a, _ := file.FindCaptures(treesitter.LanguagePhp, view_query, QUERY_CAPTURE_VIEW_NAME)
 	b, _ := file.FindCaptures(treesitter.LanguagePhpOnly, view_query, QUERY_CAPTURE_VIEW_NAME)
 	return append(a, b...)

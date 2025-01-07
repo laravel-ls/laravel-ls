@@ -14,7 +14,7 @@ const QUERY_CAPTURE_ENV_KEY = "env.key"
 //go:embed calls.scm
 var calls_query string
 
-func EnvCalls(file *parser.File) parser.CaptureSlice {
+func EnvCalls(file *parser.File) treesitter.CaptureSlice {
 	a, _ := file.FindCaptures(treesitter.LanguagePhp, calls_query, QUERY_CAPTURE_ENV_KEY)
 	b, _ := file.FindCaptures(treesitter.LanguagePhpOnly, calls_query, QUERY_CAPTURE_ENV_KEY)
 	return append(a, b...)
