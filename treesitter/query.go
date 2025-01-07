@@ -17,8 +17,9 @@ var queryCache = cache.New[*ts.Query]()
 // this is a hack that's needed because php and php_only are different
 // languages in treesitter (but are logically the same).
 var fileAlias = map[string]string{
-	"php_only/env.scm":  "php/env.scm",
-	"php_only/view.scm": "php/view.scm",
+	"php_only/env.scm":   "php/env.scm",
+	"php_only/view.scm":  "php/view.scm",
+	"php_only/asset.scm": "php/asset.scm",
 }
 
 var ErrQueryNotFound error = errors.New("query not found")

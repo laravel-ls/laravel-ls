@@ -6,6 +6,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/laravel-ls/laravel-ls/laravel/providers/assets"
 	"github.com/laravel-ls/laravel-ls/laravel/providers/env"
 	"github.com/laravel-ls/laravel-ls/laravel/providers/view"
 	"github.com/laravel-ls/laravel-ls/lsp/server"
@@ -57,6 +58,7 @@ var rootCmd = &cobra.Command{
 		providerManager := provider.NewManager()
 		providerManager.Add(view.NewProvider())
 		providerManager.Add(env.NewProvider())
+		providerManager.Add(assets.NewProvider())
 
 		defer treesitter.FreeQueryCache()
 
