@@ -57,11 +57,6 @@ func (f *File) Query(pattern string) (*ts.Query, *ts.QueryError) {
 	return ts.NewQuery(f.Tree.tree.Language(), pattern)
 }
 
-type Capture struct {
-	Name string
-	Node ts.Node
-}
-
 func (f *File) FindCaptures(language, pattern string, captures ...string) ([]Capture, error) {
 	return f.Tree.FindCaptures(language, pattern, f.Src, captures...)
 }
