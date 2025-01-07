@@ -8,6 +8,7 @@ type Language struct {
 	CompletionProviders  []CompletionProvider
 	DiagnosticsProviders []DiagnosticProvider
 	DefinitionProviders  []DefinitionProvider
+	CodeActionProviders  []CodeActionProvider
 	HoverProviders       []HoverProvider
 }
 
@@ -61,7 +62,19 @@ func (m *Manager) Register(typ file.Type, provider any) {
 		lang.HoverProviders = append(lang.HoverProviders, hover)
 	}
 
+	if codeAction, ok := provider.(CodeActionProvider); ok {
+		lang.CodeActionProviders = append(lang.CodeActionProviders, codeAction)
+	}
+
 	m.languages[typ] = lang
+}
+
+func (m *Manager) CodeAction(ctx CodeActionContext) {
+	if providers, ok := m.languages[ctx.File.Type]; ok {
+		for _, provider := range providers.CodeActionProviders {
+			provider.ResolveCodeAction(ctx)
+		}
+	}
 }
 
 func (m *Manager) Completion(ctx CompletionContext) {
