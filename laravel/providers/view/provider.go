@@ -8,6 +8,7 @@ import (
 	"github.com/laravel-ls/laravel-ls/laravel/providers/view/queries"
 	"github.com/laravel-ls/laravel-ls/lsp/protocol"
 	"github.com/laravel-ls/laravel-ls/provider"
+	"github.com/laravel-ls/laravel-ls/treesitter/php"
 )
 
 type Provider struct {
@@ -36,10 +37,10 @@ func (p *Provider) Register(manager *provider.Manager) {
 
 // resolve view() calls to view files.
 func (p *Provider) ResolveDefinition(ctx provider.DefinitionContext) {
-	node := queries.ViewNameAtPosition(ctx.File, ctx.Position)
+	node := queries.ViewNames(ctx.File).At(ctx.Position)
 
 	if node != nil {
-		name := queries.GetViewName(node, ctx.File.Src)
+		name := php.GetStringContent(node, ctx.File.Src)
 
 		if len(name) < 1 {
 			return
@@ -62,12 +63,12 @@ func (p *Provider) ResolveDefinition(ctx provider.DefinitionContext) {
 }
 
 func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
-	node := queries.ViewNameAtPosition(ctx.File, ctx.Position)
+	node := queries.ViewNames(ctx.File).At(ctx.Position)
 
 	ctx.Logger.Debug(node)
 
 	if node != nil {
-		text := queries.GetViewName(node, ctx.File.Src)
+		text := php.GetStringContent(node, ctx.File.Src)
 
 		ctx.Logger.Debug(text)
 
@@ -90,7 +91,7 @@ func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
 func (p *Provider) Diagnostic(ctx provider.DiagnosticContext) {
 	// Find all view calls in the file.
 	for _, capture := range queries.ViewNames(ctx.File) {
-		name := queries.GetViewName(&capture.Node, ctx.File.Src)
+		name := php.GetStringContent(&capture.Node, ctx.File.Src)
 
 		// Report diagnostic if view does not exist.
 		if !p.fs.exists(p.rootPath, name) {
@@ -104,10 +105,10 @@ func (p *Provider) Diagnostic(ctx provider.DiagnosticContext) {
 }
 
 func (p *Provider) Hover(ctx provider.HoverContext) {
-	node := queries.ViewNameAtPosition(ctx.File, ctx.Position)
+	node := queries.ViewNames(ctx.File).At(ctx.Position)
 
 	if node != nil {
-		name := queries.GetViewName(node, ctx.File.Src)
+		name := php.GetStringContent(node, ctx.File.Src)
 		if len(name) < 1 {
 			return
 		}
