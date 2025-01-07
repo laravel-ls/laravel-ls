@@ -3,7 +3,7 @@ package file_test
 import (
 	"testing"
 
-	"laravel-ls/file"
+	"github.com/laravel-ls/laravel-ls/file"
 )
 
 func Test_TypeByFilename(t *testing.T) {

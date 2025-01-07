@@ -1,7 +1,7 @@
 package treesitter
 
 import (
-	"laravel-ls/file"
+	"github.com/laravel-ls/laravel-ls/file"
 
 	blade "github.com/EmranMR/tree-sitter-blade/bindings/go"
 	dotenv "github.com/pnx/tree-sitter-dotenv/bindings/go"

@@ -1,9 +1,9 @@
 package parser
 
 import (
-	"laravel-ls/file"
-	"laravel-ls/treesitter"
-	"laravel-ls/utils"
+	"github.com/laravel-ls/laravel-ls/file"
+	"github.com/laravel-ls/laravel-ls/treesitter"
+	"github.com/laravel-ls/laravel-ls/utils"
 
 	ts "github.com/tree-sitter/go-tree-sitter"
 )

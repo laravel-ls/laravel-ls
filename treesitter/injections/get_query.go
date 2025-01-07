@@ -3,7 +3,7 @@ package injections
 import (
 	_ "embed"
 
-	"laravel-ls/treesitter"
+	"github.com/laravel-ls/laravel-ls/treesitter"
 )
 
 //go:embed queries/php.scm

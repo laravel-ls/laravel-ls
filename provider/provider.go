@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"laravel-ls/cache"
+	"github.com/laravel-ls/laravel-ls/cache"
 
 	log "github.com/sirupsen/logrus"
 )

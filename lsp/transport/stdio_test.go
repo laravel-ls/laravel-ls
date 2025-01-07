@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"laravel-ls/lsp/transport"
+	"github.com/laravel-ls/laravel-ls/lsp/transport"
 
 	"github.com/stretchr/testify/assert"
 )

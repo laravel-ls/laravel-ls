@@ -3,8 +3,8 @@ package queries
 import (
 	_ "embed"
 
-	"laravel-ls/parser"
-	"laravel-ls/treesitter"
+	"github.com/laravel-ls/laravel-ls/parser"
+	"github.com/laravel-ls/laravel-ls/treesitter"
 
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
