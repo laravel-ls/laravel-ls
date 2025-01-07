@@ -46,6 +46,35 @@ func validateURI(uri string) (string, error) {
 	return path, err
 }
 
+func (s *Server) HandleTextDocumentCodeAction(params protocol.CodeActionParams) (protocol.CodeActionResult, error) {
+	log.WithField("method", protocol.MethodTextDocumentCompletion).
+		WithField("filename", params.TextDocument.URI).
+		Info("code action")
+
+	response := protocol.CodeActionResult{}
+
+	filename, err := validateURI(params.TextDocument.URI)
+	if err != nil {
+		return response, err
+	}
+
+	file := s.cache.Get(filename)
+
+	s.providerManager.CodeAction(provider.CodeActionContext{
+		BaseContext: provider.BaseContext{
+			Logger:    log.WithField("module", "CodeAction"),
+			File:      file,
+			FileCache: s.cache,
+		},
+		Range: toTSRange(params.Range),
+		Publish: func(codeAction protocol.CodeAction) {
+			response.CodeActions = append(response.CodeActions, codeAction)
+		},
+	})
+
+	return response, nil
+}
+
 func (s *Server) HandleTextDocumentCompletion(params protocol.CompletionParams) (protocol.CompletionResult, error) {
 	log.WithField("method", protocol.MethodTextDocumentCompletion).
 		WithField("filename", params.TextDocument.URI).
@@ -290,6 +319,7 @@ func (s *Server) HandleInitialize(params protocol.InitializeParams) (protocol.In
 			},
 			DefinitionProvider: true,
 			DiagnosticProvider: true,
+			CodeActionProvider: true,
 		},
 		ServerInfo: &protocol.ServerInfo{
 			Name:    laravel_ls.Name,
@@ -301,6 +331,12 @@ func (s *Server) HandleInitialize(params protocol.InitializeParams) (protocol.In
 // Handle incoming LSP messages
 func (s *Server) dispatch(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) (any, error) {
 	switch req.Method {
+	case protocol.MethodTextDocumentCodeAction:
+		var params protocol.CodeActionParams
+		if err := json.Unmarshal(*req.Params, &params); err != nil {
+			return nil, err
+		}
+		return s.HandleTextDocumentCodeAction(params)
 	case protocol.MethodTextDocumentCompletion:
 		var params protocol.CompletionParams
 		if err := json.Unmarshal(*req.Params, &params); err != nil {
