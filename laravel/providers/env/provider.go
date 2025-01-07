@@ -1,6 +1,7 @@
 package env
 
 import (
+	"fmt"
 	"path"
 
 	"github.com/laravel-ls/laravel-ls/cache"
@@ -14,7 +15,12 @@ import (
 
 type Provider struct {
 	rootPath string
-	repo     Repository
+
+	// Repository for key,value pairs in .env
+	repo Repository
+
+	// Repository for key,value pairs in .env.example
+	exampleRepo Repository
 }
 
 func NewProvider() *Provider {
@@ -29,21 +35,63 @@ func (p *Provider) Init(ctx provider.InitContext) {
 	p.rootPath = ctx.RootPath
 }
 
-func (p *Provider) updateRepo(logger *log.Entry, FileCache *cache.FileCache) bool {
-	filePath := path.Join(p.rootPath, ".env")
-
-	envFile, err := FileCache.Open(filePath)
+func updateRepoFile(logger *log.Entry, FileCache *cache.FileCache, filename string, repo *Repository) bool {
+	envFile, err := FileCache.Open(filename)
 	if err != nil {
-		logger.WithError(err).Error("failed to open env file")
+		logger.WithField("filename", filename).
+			WithError(err).Error("failed to open env file")
 		return false
 	}
 
-	if err := p.repo.Load(envFile); err != nil {
-		logger.WithError(err).Error("failed to parse env file")
+	if err := repo.Load(envFile); err != nil {
+		logger.WithField("filename", filename).
+			WithError(err).Error("failed to parse env file")
 		return false
 	}
 
 	return true
+}
+
+func (p *Provider) updateRepo(logger *log.Entry, FileCache *cache.FileCache) bool {
+	filename := path.Join(p.rootPath, ".env")
+
+	// example file is optional, so don't return false if it fails.
+	updateRepoFile(logger, FileCache, filename+".example", &p.exampleRepo)
+
+	return updateRepoFile(logger, FileCache, filename, &p.repo)
+}
+
+func (p *Provider) ResolveCodeAction(ctx provider.CodeActionContext) {
+	nodes := queries.EnvCallsInRange(ctx.File, ctx.Range)
+
+	if len(nodes) > 0 && !p.updateRepo(ctx.Logger, ctx.FileCache) {
+		return
+	}
+
+	for _, node := range nodes {
+		key := queries.GetKey(node, ctx.File.Src)
+		if len(key) < 1 {
+			return
+		}
+
+		if _, found := p.repo.Get(key); !found {
+			uri := "file://" + path.Join(p.rootPath, ".env")
+			envFile := ctx.FileCache.Get(path.Join(p.rootPath, ".env"))
+			endPos := envFile.Tree.Root().EndPosition()
+
+			// If end position is not a empty line, move to the next
+			// that sure must be empty.
+			if endPos.Column != 0 {
+				endPos.Row += 1
+			}
+
+			if meta, found := p.exampleRepo.Get(key); found {
+				text := fmt.Sprintf("%s=%s", key, meta.Value)
+				ctx.Publish(codeAction(uri, "Copy value from .env.example", int(endPos.Row), text))
+			}
+			ctx.Publish(codeAction(uri, "Add value to .env file", int(endPos.Row), key+"="))
+		}
+	}
 }
 
 func (p *Provider) Hover(ctx provider.HoverContext) {
