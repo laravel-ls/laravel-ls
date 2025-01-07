@@ -138,7 +138,7 @@ func (t LanguageTree) FindCaptures(language, pattern string, source []byte, capt
 	for _, capture := range captures {
 		index, ok := query.CaptureIndexForName(capture)
 		if !ok {
-			return nil, fmt.Errorf("Capture '%s' is not present in query", capture)
+			return nil, fmt.Errorf("capture '%s' is not present in query", capture)
 		}
 
 		captureMap[index] = capture
