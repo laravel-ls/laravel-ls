@@ -7,7 +7,6 @@ import (
 	"github.com/laravel-ls/laravel-ls/treesitter/debug"
 	"github.com/laravel-ls/laravel-ls/treesitter/injections"
 
-	"github.com/sirupsen/logrus"
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
 
@@ -171,8 +170,6 @@ func (t LanguageTree) FindCaptures(language, pattern string, source []byte, capt
 // Find all trees of a given language that includes the node
 func (t *LanguageTree) GetLanguageTreesWithNode(language string, node *ts.Node) []*LanguageTree {
 	results := []*LanguageTree{}
-
-	logrus.Debug(t.language, t.Root().Range(), node.Range())
 
 	if t.language == language && treesitter.RangeOverlap(t.Root().Range(), node.Range()) {
 		results = append(results, t)

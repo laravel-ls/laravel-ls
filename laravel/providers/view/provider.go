@@ -65,12 +65,8 @@ func (p *Provider) ResolveDefinition(ctx provider.DefinitionContext) {
 func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
 	node := queries.ViewNames(ctx.File).At(ctx.Position)
 
-	ctx.Logger.Debug(node)
-
 	if node != nil {
 		text := php.GetStringContent(node, ctx.File.Src)
-
-		ctx.Logger.Debug(text)
 
 		results, err := p.fs.search(p.rootPath, text)
 		if err != nil {
