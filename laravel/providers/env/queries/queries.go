@@ -29,6 +29,16 @@ func EnvCallAtPosition(file *parser.File, position ts.Point) *ts.Node {
 	return nil
 }
 
+func EnvCallsInRange(file *parser.File, r ts.Range) []*ts.Node {
+	nodes := []*ts.Node{}
+	for _, capture := range EnvCalls(file) {
+		if treesitter.RangeOverlap(r, capture.Node.Range()) {
+			nodes = append(nodes, &capture.Node)
+		}
+	}
+	return nodes
+}
+
 func GetKey(node *ts.Node, source []byte) string {
 	if (node.Kind() == "string" || node.Kind() == "encapsed_string") && node.NamedChildCount() > 0 {
 		contentNode := node.NamedChild(0)
