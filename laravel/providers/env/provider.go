@@ -9,6 +9,7 @@ import (
 	"github.com/laravel-ls/laravel-ls/laravel/providers/env/queries"
 	"github.com/laravel-ls/laravel-ls/lsp/protocol"
 	"github.com/laravel-ls/laravel-ls/provider"
+	"github.com/laravel-ls/laravel-ls/treesitter/php"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -62,14 +63,14 @@ func (p *Provider) updateRepo(logger *log.Entry, FileCache *cache.FileCache) boo
 }
 
 func (p *Provider) ResolveCodeAction(ctx provider.CodeActionContext) {
-	nodes := queries.EnvCallsInRange(ctx.File, ctx.Range)
+	nodes := queries.EnvCalls(ctx.File).In(ctx.Range)
 
 	if len(nodes) > 0 && !p.updateRepo(ctx.Logger, ctx.FileCache) {
 		return
 	}
 
 	for _, node := range nodes {
-		key := queries.GetKey(node, ctx.File.Src)
+		key := php.GetStringContent(node, ctx.File.Src)
 		if len(key) < 1 {
 			return
 		}
@@ -95,14 +96,14 @@ func (p *Provider) ResolveCodeAction(ctx provider.CodeActionContext) {
 }
 
 func (p *Provider) Hover(ctx provider.HoverContext) {
-	node := queries.EnvCallAtPosition(ctx.File, ctx.Position)
+	node := queries.EnvCalls(ctx.File).At(ctx.Position)
 
 	if node != nil {
 		if !p.updateRepo(ctx.Logger, ctx.FileCache) {
 			return
 		}
 
-		key := queries.GetKey(node, ctx.File.Src)
+		key := php.GetStringContent(node, ctx.File.Src)
 		if len(key) < 1 {
 			return
 		}
@@ -124,13 +125,13 @@ func (p *Provider) Hover(ctx provider.HoverContext) {
 
 // resolve env() calls to variable
 func (p *Provider) ResolveDefinition(ctx provider.DefinitionContext) {
-	node := queries.EnvCallAtPosition(ctx.File, ctx.Position)
+	node := queries.EnvCalls(ctx.File).At(ctx.Position)
 	if node != nil {
 		if !p.updateRepo(ctx.Logger, ctx.FileCache) {
 			return
 		}
 
-		key := queries.GetKey(node, ctx.File.Src)
+		key := php.GetStringContent(node, ctx.File.Src)
 		if meta, found := p.repo.Get(key); found {
 			ctx.Publish(protocol.Location{
 				URI: path.Join(p.rootPath, ".env"),
@@ -146,14 +147,14 @@ func (p *Provider) ResolveDefinition(ctx provider.DefinitionContext) {
 }
 
 func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
-	node := queries.EnvCallAtPosition(ctx.File, ctx.Position)
+	node := queries.EnvCalls(ctx.File).At(ctx.Position)
 
 	if node != nil {
 		if !p.updateRepo(ctx.Logger, ctx.FileCache) {
 			return
 		}
 
-		text := queries.GetKey(node, ctx.File.Src)
+		text := php.GetStringContent(node, ctx.File.Src)
 
 		for key, meta := range p.repo.Find(text) {
 			ctx.Publish(protocol.CompletionItem{
@@ -175,7 +176,7 @@ func (p *Provider) Diagnostic(ctx provider.DiagnosticContext) {
 		}
 
 		for _, capture := range captures {
-			key := queries.GetKey(&capture.Node, ctx.File.Src)
+			key := php.GetStringContent(&capture.Node, ctx.File.Src)
 
 			// Report diagnostic if key is not defined
 			// and no default value is given
