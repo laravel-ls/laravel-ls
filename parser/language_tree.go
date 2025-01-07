@@ -125,7 +125,7 @@ func (t LanguageTree) GetLanguageTrees(language string) []*LanguageTree {
 	return results
 }
 
-func (t LanguageTree) FindCaptures(language, pattern string, source []byte, captures ...string) ([]Capture, error) {
+func (t LanguageTree) FindCaptures(language, pattern string, source []byte, captures ...string) (CaptureSlice, error) {
 	query, err := ts.NewQuery(treesitter.GetLanguage(language), pattern)
 	if err != nil {
 		return nil, err

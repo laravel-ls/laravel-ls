@@ -57,7 +57,7 @@ func (f *File) Query(pattern string) (*ts.Query, *ts.QueryError) {
 	return ts.NewQuery(f.Tree.tree.Language(), pattern)
 }
 
-func (f *File) FindCaptures(language, pattern string, captures ...string) ([]Capture, error) {
+func (f *File) FindCaptures(language, pattern string, captures ...string) (CaptureSlice, error) {
 	return f.Tree.FindCaptures(language, pattern, f.Src, captures...)
 }
 
