@@ -57,7 +57,7 @@ Env::get('APP_NAME');
 - [x] Go to `.env` file and key location
 - [x] Auto-complete for defined keys.
 - [x] Diagnostics for non defined keys.
-- [ ] Code action to create missing key
+- [x] Code action to create missing key
 
 ### Config
 
