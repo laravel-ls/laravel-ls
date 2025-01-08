@@ -4,7 +4,8 @@
   arguments: (arguments
     . (argument [
         (string (string_content)?) @env.key
-        (encapsed_string (string_content)?) @env.key
+        (encapsed_string . (string_content) .) @env.key
+        (encapsed_string "\"" . "\"") @env.key
     ])
 ))
 
@@ -18,6 +19,7 @@
   arguments: (arguments
     . (argument [
         (string (string_content)?) @env.key
-        (encapsed_string (string_content)?) @env.key
+        (encapsed_string . (string_content) .) @env.key
+        (encapsed_string "\"" . "\"") @env.key
     ])
 ))
