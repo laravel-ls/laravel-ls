@@ -4,7 +4,8 @@
     arguments: (arguments
         . (argument [
             (string (string_content)?) @view.name
-            (encapsed_string (string_content)?) @view.name
+            (encapsed_string . (string_content) .) @view.name
+            (encapsed_string "\"" . "\"") @view.name
         ])
     ))
 
@@ -19,6 +20,7 @@
         (argument) ; First parameter is the route.
         . (argument [
             (string (string_content)?) @view.name
-            (encapsed_string (string_content)?) @view.name
+            (encapsed_string . (string_content) .) @view.name
+            (encapsed_string "\"" . "\"") @view.name
         ])
     ))
