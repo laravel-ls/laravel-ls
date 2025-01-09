@@ -79,19 +79,13 @@ func (p *Provider) ResolveCodeAction(ctx provider.CodeActionContext) {
 		if _, found := p.repo.Get(key); !found {
 			uri := "file://" + path.Join(p.rootPath, ".env")
 			envFile := ctx.FileCache.Get(path.Join(p.rootPath, ".env"))
-			endPos := envFile.Tree.Root().EndPosition()
-
-			// If end position is not a empty line, move to the next
-			// that sure must be empty.
-			if endPos.Column != 0 {
-				endPos.Row += 1
-			}
+			line := int(envFile.Tree.Root().EndPosition().Row)
 
 			if meta, found := p.exampleRepo.Get(key); found {
 				text := fmt.Sprintf("%s=%s", key, meta.Value)
-				ctx.Publish(codeAction(uri, "Copy value from .env.example", int(endPos.Row), text))
+				ctx.Publish(codeAction(uri, "Copy value from .env.example", line, text))
 			}
-			ctx.Publish(codeAction(uri, "Add value to .env file", int(endPos.Row), key+"="))
+			ctx.Publish(codeAction(uri, "Add value to .env file", line, key+"="))
 		}
 	}
 }
