@@ -6,14 +6,6 @@ import (
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
 
-// func getNodeAt(file *parser.File, pos protocol.Position) *ts.Node {
-// 	point := ts.Point{
-// 		Row:    uint(pos.Line),
-// 		Column: uint(pos.Character),
-// 	}
-// 	return file.GetNodeAt(point)
-// }
-
 func toTSPoint(pos protocol.Position) ts.Point {
 	return ts.Point{
 		Row:    uint(pos.Line),

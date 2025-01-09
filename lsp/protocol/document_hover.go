@@ -8,11 +8,6 @@ const (
 	MethodTextDocumentHover = "textDocument/hover"
 )
 
-// interface HoverParams {
-// 	textDocument: string; /** The text document's URI in string form */
-// 	position: { line: uinteger; character: uinteger; };
-// }
-
 // HoverParams represents the parameters for a `textDocument/hover` request.
 // It provides the position in the text document where hover information is requested.
 type HoverParams struct {

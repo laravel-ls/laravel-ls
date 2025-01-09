@@ -47,12 +47,6 @@ func (f *File) Update(start, end ts.Point, src []byte) error {
 	return f.Tree.parse(f.Src)
 }
 
-// Get the node at a given position
-// func (f *File) GetNodeAt(point ts.Point) *ts.Node {
-// 	// return GetNodeAt(f.Tree.RootNode(), point)
-// 	return GetNodeAt(f.Tree.tree.RootNode(), point)
-// }
-
 func (f *File) Query(pattern string) (*ts.Query, *ts.QueryError) {
 	return ts.NewQuery(f.Tree.tree.Language(), pattern)
 }
