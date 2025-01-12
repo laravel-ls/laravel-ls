@@ -5,6 +5,7 @@ import (
 
 	"github.com/laravel-ls/laravel-ls/treesitter"
 	"github.com/laravel-ls/laravel-ls/treesitter/injections"
+	"github.com/laravel-ls/laravel-ls/treesitter/queries"
 
 	"github.com/stretchr/testify/assert"
 	ts "github.com/tree-sitter/go-tree-sitter"
@@ -22,7 +23,10 @@ func TestQuery(t *testing.T) {
 	assert.NoError(t, parser.SetLanguage(lang))
 	tree := parser.Parse(src, nil)
 
-	query, err := ts.NewQuery(lang, injections.GetQuery(treesitter.LanguagePhp))
+	injectionQuery, err := queries.GetInjectionQuery(treesitter.LanguagePhp)
+	assert.Nil(t, err)
+
+	query, err := ts.NewQuery(lang, injectionQuery)
 	assert.Nil(t, err)
 
 	expected := []injections.Capture{
@@ -76,7 +80,10 @@ func TestQuery_Blade(t *testing.T) {
 	assert.NoError(t, parser.SetLanguage(lang))
 	tree := parser.Parse(src, nil)
 
-	query, err := ts.NewQuery(lang, injections.GetQuery(treesitter.LanguageBlade))
+	injectionQuery, err := queries.GetInjectionQuery(treesitter.LanguageBlade)
+	assert.Nil(t, err)
+
+	query, err := ts.NewQuery(lang, string(injectionQuery))
 	assert.Nil(t, err)
 
 	expected := []injections.Capture{
