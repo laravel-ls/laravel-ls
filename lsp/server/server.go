@@ -11,6 +11,7 @@ import (
 	laravel_ls "github.com/laravel-ls/laravel-ls"
 	"github.com/laravel-ls/laravel-ls/cache"
 	"github.com/laravel-ls/laravel-ls/lsp/protocol"
+	"github.com/laravel-ls/laravel-ls/parser"
 	"github.com/laravel-ls/laravel-ls/provider"
 
 	log "github.com/sirupsen/logrus"
@@ -53,12 +54,10 @@ func (s *Server) HandleTextDocumentCodeAction(params protocol.CodeActionParams) 
 
 	response := protocol.CodeActionResult{}
 
-	filename, err := validateURI(params.TextDocument.URI)
+	file, err := s.getFile(params.TextDocument)
 	if err != nil {
 		return response, err
 	}
-
-	file := s.cache.Get(filename)
 
 	s.providerManager.CodeAction(provider.CodeActionContext{
 		BaseContext: provider.BaseContext{
@@ -84,12 +83,10 @@ func (s *Server) HandleTextDocumentCompletion(params protocol.CompletionParams) 
 		CompletionItems: []protocol.CompletionItem{},
 	}
 
-	filename, err := validateURI(params.TextDocument.URI)
+	file, err := s.getFile(params.TextDocument)
 	if err != nil {
-		return response, err
+		return response, ErrFileNotOpened
 	}
-
-	file := s.cache.Get(filename)
 
 	context := provider.CompletionContext{
 		BaseContext: provider.BaseContext{
@@ -115,12 +112,10 @@ func (s *Server) HandleTextDocumentHover(params protocol.HoverParams) (protocol.
 
 	response := protocol.HoverResult{}
 
-	filename, err := validateURI(params.TextDocument.URI)
+	file, err := s.getFile(params.TextDocument)
 	if err != nil {
 		return response, err
 	}
-
-	file := s.cache.Get(filename)
 
 	content := ""
 
@@ -150,14 +145,9 @@ func (s *Server) HandleTextDocumentDiagnostic(params protocol.DocumentDiagnostic
 		WithField("filename", params.TextDocument.URI).
 		Info("Diagnostic")
 
-	filename, err := validateURI(params.TextDocument.URI)
-	if err != nil {
-		return &protocol.FullDocumentDiagnosticReport{}, err
-	}
-
-	file := s.cache.Get(filename)
+	file, err := s.getFile(params.TextDocument)
 	if file == nil {
-		return &protocol.FullDocumentDiagnosticReport{}, ErrFileNotOpened
+		return &protocol.FullDocumentDiagnosticReport{}, err
 	}
 
 	items := []protocol.Diagnostic{}
@@ -195,14 +185,9 @@ func (s *Server) HandleTextDocumentDefinition(params protocol.DefinitionParams) 
 		WithField("filename", params.TextDocument.URI).
 		Info("Definition")
 
-	filename, err := validateURI(params.TextDocument.URI)
+	file, err := s.getFile(params.TextDocument)
 	if err != nil {
 		return response, err
-	}
-
-	file := s.cache.Get(filename)
-	if file == nil {
-		return response, ErrFileNotOpened
 	}
 
 	logger := log.WithField("module", "Definition")
@@ -245,13 +230,8 @@ func (s Server) HandleTextDocumentDidChange(params protocol.DidChangeTextDocumen
 		WithField("filename", params.TextDocument.URI).
 		Info("Document changed")
 
-	filename, err := validateURI(params.TextDocument.URI)
+	file, err := s.getFile(params.TextDocument.TextDocumentIdentifier)
 	if err != nil {
-		return err
-	}
-
-	file := s.cache.Get(filename)
-	if file == nil {
 		return ErrFileNotOpened
 	}
 
@@ -414,4 +394,17 @@ func (s Server) Run(ctx context.Context, conn io.ReadWriteCloser) error {
 	case <-rpc.DisconnectNotify():
 		return nil
 	}
+}
+
+func (s *Server) getFile(identifier protocol.TextDocumentIdentifier) (*parser.File, error) {
+	filename, err := validateURI(identifier.URI)
+	if err != nil {
+		return nil, err
+	}
+
+	file := s.cache.Get(filename)
+	if file == nil {
+		return nil, ErrFileNotOpened
+	}
+	return file, nil
 }
