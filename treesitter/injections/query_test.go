@@ -22,7 +22,7 @@ func TestQuery(t *testing.T) {
 	assert.NoError(t, parser.SetLanguage(lang))
 	tree := parser.Parse(src, nil)
 
-	injectionQuery, err := treesitter.GetInjectionQuery(treesitter.LanguagePhp)
+	injectionQuery, err := treesitter.ReadQueryFromFile(treesitter.LanguagePhp, "injections")
 	assert.Nil(t, err)
 
 	query, err := ts.NewQuery(lang, injectionQuery)
@@ -79,10 +79,10 @@ func TestQuery_Blade(t *testing.T) {
 	assert.NoError(t, parser.SetLanguage(lang))
 	tree := parser.Parse(src, nil)
 
-	injectionQuery, err := treesitter.GetInjectionQuery(treesitter.LanguageBlade)
+	injectionQuery, err := treesitter.ReadQueryFromFile(treesitter.LanguageBlade, "injections")
 	assert.Nil(t, err)
 
-	query, err := ts.NewQuery(lang, string(injectionQuery))
+	query, err := ts.NewQuery(lang, injectionQuery)
 	assert.Nil(t, err)
 
 	expected := []injections.Capture{

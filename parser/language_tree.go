@@ -69,21 +69,12 @@ func (t *LanguageTree) parse(source []byte) error {
 }
 
 func (t *LanguageTree) parseInjections(source []byte) error {
-	injectionQuery, err := treesitter.GetInjectionQuery(t.language)
+	query, err := treesitter.GetInjectionQuery(t.language)
 	if err != nil {
 		if err == treesitter.ErrQueryNotFound {
 			return nil
 		}
 		return err
-	}
-
-	if len(injectionQuery) < 1 {
-		return nil
-	}
-
-	query, tserr := ts.NewQuery(t.tree.Language(), string(injectionQuery))
-	if tserr != nil {
-		return tserr
 	}
 	defer query.Close()
 
@@ -130,13 +121,7 @@ func (t LanguageTree) GetLanguageTrees(language string) []*LanguageTree {
 	return results
 }
 
-func (t LanguageTree) FindCaptures(language, pattern string, source []byte, captures ...string) (treesitter.CaptureSlice, error) {
-	query, err := ts.NewQuery(treesitter.GetLanguage(language), pattern)
-	if err != nil {
-		return nil, err
-	}
-	defer query.Close()
-
+func (t LanguageTree) FindCaptures(language string, query *ts.Query, source []byte, captures ...string) (treesitter.CaptureSlice, error) {
 	// Build a map of index name pairs.
 	captureMap := map[uint]string{}
 

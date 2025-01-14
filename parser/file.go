@@ -51,12 +51,12 @@ func (f *File) Query(pattern string) (*ts.Query, *ts.QueryError) {
 	return ts.NewQuery(f.Tree.tree.Language(), pattern)
 }
 
-func (f *File) FindCaptures(language, pattern string, captures ...string) (treesitter.CaptureSlice, error) {
-	return f.Tree.FindCaptures(language, pattern, f.Src, captures...)
+func (f *File) FindCaptures(language string, query *ts.Query, captures ...string) (treesitter.CaptureSlice, error) {
+	return f.Tree.FindCaptures(language, query, f.Src, captures...)
 }
 
-func (f *File) NodeMatchesCapture(language, pattern, capture string, node *ts.Node) bool {
-	captures, err := f.FindCaptures(language, pattern, capture)
+func (f *File) NodeMatchesCapture(language string, query *ts.Query, capture string, node *ts.Node) bool {
+	captures, err := f.FindCaptures(language, query, capture)
 	if err != nil {
 		return false
 	}

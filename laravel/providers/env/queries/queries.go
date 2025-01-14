@@ -11,16 +11,22 @@ import (
 
 const QUERY_CAPTURE_ENV_KEY = "env.key"
 
-func getQuery() string {
-	q, _ := treesitter.GetQuery(treesitter.LanguagePhp, "env")
-	return q
+func queryEnvCalls(file *parser.File, lang string) treesitter.CaptureSlice {
+	query, err := treesitter.GetQuery(lang, "env")
+	if err != nil {
+		return treesitter.CaptureSlice{}
+	}
+	defer query.Close()
+	r, err := file.FindCaptures(lang, query, QUERY_CAPTURE_ENV_KEY)
+	if err != nil {
+		return treesitter.CaptureSlice{}
+	}
+	return r
 }
 
 func EnvCalls(file *parser.File) treesitter.CaptureSlice {
-	query := getQuery()
-	a, _ := file.FindCaptures(treesitter.LanguagePhp, query, QUERY_CAPTURE_ENV_KEY)
-	b, _ := file.FindCaptures(treesitter.LanguagePhpOnly, query, QUERY_CAPTURE_ENV_KEY)
-	return append(a, b...)
+	return append(queryEnvCalls(file, treesitter.LanguagePhp),
+		queryEnvCalls(file, treesitter.LanguagePhpOnly)...)
 }
 
 // Check if a env call has a default value.

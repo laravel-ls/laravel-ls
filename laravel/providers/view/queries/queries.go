@@ -9,14 +9,20 @@ import (
 
 const QUERY_CAPTURE_VIEW_NAME = "view.name"
 
-func getQuery() string {
-	q, _ := treesitter.GetQuery(treesitter.LanguagePhp, "view")
-	return q
+func findViewNames(file *parser.File, lang string) treesitter.CaptureSlice {
+	query, err := treesitter.GetQuery(lang, "view")
+	if err != nil {
+		return treesitter.CaptureSlice{}
+	}
+	defer query.Close()
+	r, err := file.FindCaptures(lang, query, QUERY_CAPTURE_VIEW_NAME)
+	if err != nil {
+		return treesitter.CaptureSlice{}
+	}
+	return r
 }
 
 func ViewNames(file *parser.File) treesitter.CaptureSlice {
-	query := getQuery()
-	a, _ := file.FindCaptures(treesitter.LanguagePhp, query, QUERY_CAPTURE_VIEW_NAME)
-	b, _ := file.FindCaptures(treesitter.LanguagePhpOnly, query, QUERY_CAPTURE_VIEW_NAME)
-	return append(a, b...)
+	return append(findViewNames(file, treesitter.LanguagePhp),
+		findViewNames(file, treesitter.LanguagePhpOnly)...)
 }
