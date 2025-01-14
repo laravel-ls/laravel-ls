@@ -1,4 +1,4 @@
-package laravel_ls
+package laravells
 
 var (
 	Name    = "laravel-ls"

@@ -9,7 +9,7 @@ import (
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
 
-const QUERY_CAPTURE_ENV_KEY = "env.key"
+const QueryCaptureEnvKey = "env.key"
 
 func queryEnvCalls(file *parser.File, lang string) treesitter.CaptureSlice {
 	query, err := treesitter.GetQuery(lang, "env")
@@ -17,7 +17,7 @@ func queryEnvCalls(file *parser.File, lang string) treesitter.CaptureSlice {
 		return treesitter.CaptureSlice{}
 	}
 	defer query.Close()
-	r, err := file.FindCaptures(lang, query, QUERY_CAPTURE_ENV_KEY)
+	r, err := file.FindCaptures(lang, query, QueryCaptureEnvKey)
 	if err != nil {
 		return treesitter.CaptureSlice{}
 	}

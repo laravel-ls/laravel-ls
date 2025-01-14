@@ -16,9 +16,9 @@ type DocumentDiagnosticParams struct {
 	// Identifier uniquely identifies the request.
 	Identifier string `json:"identifier,omitempty"`
 
-	// PreviousResultId is the identifier of the last known result for this document.
+	// PreviousResultID is the identifier of the last known result for this document.
 	// The server may use this to optimize diagnostic calculations and only return differences.
-	PreviousResultId string `json:"previousResultId,omitempty"`
+	PreviousResultID string `json:"previousResultId,omitempty"`
 }
 
 // DocumentDiagnosticReport is an interface for diagnostic reports,
@@ -32,8 +32,8 @@ type FullDocumentDiagnosticReport struct {
 	// Kind indicates this is a full document diagnostic report.
 	Kind string `json:"kind"` // Should be "full"
 
-	// ResultId is an optional identifier for caching and incremental updates.
-	ResultId string `json:"resultId,omitempty"`
+	// ResultID is an optional identifier for caching and incremental updates.
+	ResultID string `json:"resultId,omitempty"`
 
 	// Items contains the list of diagnostics for the document.
 	Items []Diagnostic `json:"items"`

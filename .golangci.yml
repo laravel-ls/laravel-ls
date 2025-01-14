@@ -8,6 +8,5 @@ linters-settings:
     module-path: laravel-ls
   stylecheck:
     checks:
-      - "ST1005"
-      - "ST1016"
+      - all
 

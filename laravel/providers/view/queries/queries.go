@@ -7,7 +7,7 @@ import (
 	"github.com/laravel-ls/laravel-ls/treesitter"
 )
 
-const QUERY_CAPTURE_VIEW_NAME = "view.name"
+const QueryCaptureViewName = "view.name"
 
 func findViewNames(file *parser.File, lang string) treesitter.CaptureSlice {
 	query, err := treesitter.GetQuery(lang, "view")
@@ -15,7 +15,7 @@ func findViewNames(file *parser.File, lang string) treesitter.CaptureSlice {
 		return treesitter.CaptureSlice{}
 	}
 	defer query.Close()
-	r, err := file.FindCaptures(lang, query, QUERY_CAPTURE_VIEW_NAME)
+	r, err := file.FindCaptures(lang, query, QueryCaptureViewName)
 	if err != nil {
 		return treesitter.CaptureSlice{}
 	}

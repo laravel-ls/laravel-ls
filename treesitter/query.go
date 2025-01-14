@@ -12,7 +12,7 @@ import (
 // A map of "virtual files" that points to some file that actually exist.
 // this is a hack that's needed because php and php_only are different
 // languages in treesitter (but are logically the same).
-var file_alias = map[string]string{
+var fileAlias = map[string]string{
 	"php_only/env.scm":  "php/env.scm",
 	"php_only/view.scm": "php/view.scm",
 }
@@ -24,7 +24,7 @@ func ReadQueryFromFile(lang, name string) (string, error) {
 	filename := path.Join(lang, name+".scm")
 
 	// Resolve any alias
-	if alias, ok := file_alias[filename]; ok {
+	if alias, ok := fileAlias[filename]; ok {
 		filename = alias
 	}
 
