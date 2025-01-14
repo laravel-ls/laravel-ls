@@ -5,7 +5,6 @@ import (
 
 	"github.com/laravel-ls/laravel-ls/parser"
 	"github.com/laravel-ls/laravel-ls/treesitter"
-	"github.com/laravel-ls/laravel-ls/treesitter/queries"
 
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
@@ -13,7 +12,7 @@ import (
 const QUERY_CAPTURE_ENV_KEY = "env.key"
 
 func getQuery() string {
-	q, _ := queries.GetQuery(treesitter.LanguagePhp, "env")
+	q, _ := treesitter.GetQuery(treesitter.LanguagePhp, "env")
 	return q
 }
 

@@ -6,7 +6,6 @@ import (
 	"github.com/laravel-ls/laravel-ls/treesitter"
 	"github.com/laravel-ls/laravel-ls/treesitter/debug"
 	"github.com/laravel-ls/laravel-ls/treesitter/injections"
-	"github.com/laravel-ls/laravel-ls/treesitter/queries"
 
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
@@ -70,9 +69,9 @@ func (t *LanguageTree) parse(source []byte) error {
 }
 
 func (t *LanguageTree) parseInjections(source []byte) error {
-	injectionQuery, err := queries.GetInjectionQuery(t.language)
+	injectionQuery, err := treesitter.GetInjectionQuery(t.language)
 	if err != nil {
-		if err == queries.ErrQueryNotFound {
+		if err == treesitter.ErrQueryNotFound {
 			return nil
 		}
 		return err
