@@ -1,6 +1,8 @@
 package treesitter
 
 import (
+	"errors"
+
 	"github.com/laravel-ls/laravel-ls/file"
 
 	blade "github.com/EmranMR/tree-sitter-blade/bindings/go"
@@ -9,6 +11,8 @@ import (
 	html "github.com/tree-sitter/tree-sitter-html/bindings/go"
 	php "github.com/tree-sitter/tree-sitter-php/bindings/go"
 )
+
+var ErrLangNotSupported = errors.New("language is not supported")
 
 // Constants for all treesitter languages that are supported
 const (
