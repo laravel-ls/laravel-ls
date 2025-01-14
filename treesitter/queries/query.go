@@ -1,19 +1,17 @@
 package queries
 
 import (
-	"embed"
 	"errors"
 	"io/fs"
 	"path"
-)
 
-//go:embed */*.scm
-var query embed.FS
+	"github.com/laravel-ls/laravel-ls/treesitter/assets"
+)
 
 var ErrQueryNotFound error = errors.New("query not found")
 
 func GetQuery(lang, name string) (string, error) {
-	q, err := query.ReadFile(path.Join(lang, name+".scm"))
+	q, err := assets.FS.ReadFile(assets.QueryPath(path.Join(lang, name+".scm")))
 
 	// if file does not exist, return ErrQueryNotFound.
 	if err != nil && errors.Unwrap(err) == fs.ErrNotExist {
