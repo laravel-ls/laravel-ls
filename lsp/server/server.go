@@ -8,10 +8,10 @@ import (
 	"io"
 	"strings"
 
-	laravel_ls "github.com/laravel-ls/laravel-ls"
 	"github.com/laravel-ls/laravel-ls/cache"
 	"github.com/laravel-ls/laravel-ls/lsp/protocol"
 	"github.com/laravel-ls/laravel-ls/parser"
+	"github.com/laravel-ls/laravel-ls/program"
 	"github.com/laravel-ls/laravel-ls/provider"
 
 	log "github.com/sirupsen/logrus"
@@ -168,7 +168,7 @@ func (s *Server) HandleTextDocumentDiagnostic(params protocol.DocumentDiagnostic
 					End:   FromTSPoint(end),
 				},
 				Severity: protocol.DiagnosticSeverity(diagnostic.Severity),
-				Source:   laravel_ls.Name,
+				Source:   program.Name,
 				Message:  diagnostic.Message,
 			})
 		},
@@ -302,8 +302,8 @@ func (s *Server) HandleInitialize(params protocol.InitializeParams) (protocol.In
 			CodeActionProvider: true,
 		},
 		ServerInfo: &protocol.ServerInfo{
-			Name:    laravel_ls.Name,
-			Version: laravel_ls.Version,
+			Name:    program.Name,
+			Version: program.Version,
 		},
 	}, nil
 }

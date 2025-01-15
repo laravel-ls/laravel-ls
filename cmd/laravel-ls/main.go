@@ -6,11 +6,11 @@ import (
 	"path"
 	"strings"
 
-	laravel_ls "github.com/laravel-ls/laravel-ls"
 	"github.com/laravel-ls/laravel-ls/laravel/providers/env"
 	"github.com/laravel-ls/laravel-ls/laravel/providers/view"
 	"github.com/laravel-ls/laravel-ls/lsp/server"
 	"github.com/laravel-ls/laravel-ls/lsp/transport"
+	"github.com/laravel-ls/laravel-ls/program"
 	"github.com/laravel-ls/laravel-ls/provider"
 
 	log "github.com/sirupsen/logrus"
@@ -32,9 +32,9 @@ func expandHome(path string) string {
 }
 
 var rootCmd = &cobra.Command{
-	Use:     laravel_ls.Name,
+	Use:     program.Name,
 	Short:   "Language server for Laravel",
-	Version: laravel_ls.Version,
+	Version: program.Version,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		basePath = expandHome(basePath)
 
