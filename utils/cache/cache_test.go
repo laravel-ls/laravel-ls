@@ -55,6 +55,26 @@ func TestCache_Remember(t *testing.T) {
 	require.False(t, ok)
 }
 
+func TestCache_Forget(t *testing.T) {
+	c := cache.New[int]()
+	c.Set("first", 1234)
+	c.Set("second", 999)
+
+	v, ok := c.Get("first")
+	require.Equal(t, 1234, v)
+	require.True(t, ok)
+
+	v, ok = c.Get("second")
+	require.Equal(t, 999, v)
+	require.True(t, ok)
+
+	c.Forget("first")
+
+	v, ok = c.Get("first")
+	require.Equal(t, 0, v)
+	require.False(t, ok)
+}
+
 func TestCache_Items(t *testing.T) {
 	c := cache.New[string]()
 

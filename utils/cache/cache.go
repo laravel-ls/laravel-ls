@@ -42,6 +42,10 @@ func (c *Cache[T]) Remember(key string, callback func(key string) (T, error)) (T
 	return value, err
 }
 
+func (c *Cache[T]) Forget(key string) {
+	delete(c.items, key)
+}
+
 // Items returns the entire map of cached items.
 func (c Cache[T]) Items() map[string]T {
 	return c.items
