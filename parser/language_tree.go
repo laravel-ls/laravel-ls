@@ -76,7 +76,6 @@ func (t *LanguageTree) parseInjections(source []byte) error {
 		}
 		return err
 	}
-	defer query.Close()
 
 	childTrees := []*LanguageTree{}
 

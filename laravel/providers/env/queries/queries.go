@@ -16,7 +16,6 @@ func queryEnvCalls(file *parser.File, lang string) treesitter.CaptureSlice {
 	if err != nil {
 		return treesitter.CaptureSlice{}
 	}
-	defer query.Close()
 	r, err := file.FindCaptures(lang, query, QueryCaptureEnvKey)
 	if err != nil {
 		return treesitter.CaptureSlice{}

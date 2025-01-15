@@ -14,7 +14,6 @@ func findViewNames(file *parser.File, lang string) treesitter.CaptureSlice {
 	if err != nil {
 		return treesitter.CaptureSlice{}
 	}
-	defer query.Close()
 	r, err := file.FindCaptures(lang, query, QueryCaptureViewName)
 	if err != nil {
 		return treesitter.CaptureSlice{}

@@ -12,6 +12,7 @@ import (
 	"github.com/laravel-ls/laravel-ls/lsp/transport"
 	"github.com/laravel-ls/laravel-ls/program"
 	"github.com/laravel-ls/laravel-ls/provider"
+	"github.com/laravel-ls/laravel-ls/treesitter"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -56,6 +57,8 @@ var rootCmd = &cobra.Command{
 		providerManager := provider.NewManager()
 		providerManager.Add(view.NewProvider())
 		providerManager.Add(env.NewProvider())
+
+		defer treesitter.FreeQueryCache()
 
 		log.Info("Starting laravel-ls")
 		server := server.NewServer(providerManager)
