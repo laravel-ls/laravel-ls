@@ -77,9 +77,9 @@ Config::get('app.name')
 asset('main.css');
 ```
 
-- [ ] Auto-completion
-- [ ] Go to asset file
-- [ ] Diagnostics for non existent assets
+- [x] Auto-completion
+- [x] Go to asset file
+- [x] Diagnostics for non existent assets
 
 ### Blade components
 
