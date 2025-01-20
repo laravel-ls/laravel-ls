@@ -1,11 +1,12 @@
-package env_test
+package evaluator_test
 
 import (
 	"testing"
 
+	"github.com/laravel-ls/laravel-ls/env"
+	"github.com/laravel-ls/laravel-ls/env/evaluator"
 	"github.com/laravel-ls/laravel-ls/file"
 	"github.com/laravel-ls/laravel-ls/parser"
-	"github.com/laravel-ls/laravel-ls/parser/env"
 
 	"github.com/stretchr/testify/require"
 )
@@ -22,7 +23,7 @@ MAIL_ENCRYPTION=null
 MAIL_FROM_ADDRESS="hello@example.com"
 MAIL_FROM_NAME="${APP_NAME}"`)
 
-	expected := map[string]env.Metadata{
+	expected := map[string]env.Variable{
 		"MAIL_MAILER":       {Value: "smtp", Line: 1, Column: 12},
 		"MAIL_HOST":         {Value: "mailpit", Line: 2, Column: 10},
 		"MAIL_PORT":         {Value: "1025", Line: 3, Column: 10},
@@ -35,7 +36,7 @@ MAIL_FROM_NAME="${APP_NAME}"`)
 
 	pFile, err := parser.Parse(src, file.TypeEnv)
 	require.NoError(t, err)
-	actual, err := env.Parse(pFile)
+	actual, err := evaluator.Evaluate(pFile)
 	require.NoError(t, err)
 	require.Equal(t, expected, actual)
 }
@@ -54,7 +55,7 @@ MAIL_ENCRYPTION="encrypt:${APP_NAME}" #comment
 MAIL_FROM_ADDRESS="hello@example.com"
 MAIL_FROM_NAME="xxx ${MAIL_ENCRYPTION} yyy"`)
 
-	expected := map[string]env.Metadata{
+	expected := map[string]env.Variable{
 		"APP_NAME":          {Value: "some_name", Line: 1, Column: 9},
 		"MAIL_MAILER":       {Value: "smtp", Line: 4, Column: 12},
 		"MAIL_HOST":         {Value: "mailpit", Line: 5, Column: 10},
@@ -68,7 +69,7 @@ MAIL_FROM_NAME="xxx ${MAIL_ENCRYPTION} yyy"`)
 
 	pFile, err := parser.Parse(src, file.TypeEnv)
 	require.NoError(t, err)
-	actual, err := env.Parse(pFile)
+	actual, err := evaluator.Evaluate(pFile)
 	require.NoError(t, err)
 	require.Equal(t, expected, actual)
 }
@@ -78,14 +79,14 @@ func TestParser_VariableSubstitutionDefinedAfter(t *testing.T) {
 MAIL_FROM_NAME="xxx ${APP_NAME} yyy"
 APP_NAME=some_name`)
 
-	expected := map[string]env.Metadata{
+	expected := map[string]env.Variable{
 		"MAIL_FROM_NAME": {Value: "xxx ${APP_NAME} yyy", Line: 1, Column: 15},
 		"APP_NAME":       {Value: "some_name", Line: 2, Column: 9},
 	}
 
 	pFile, err := parser.Parse(src, file.TypeEnv)
 	require.NoError(t, err)
-	actual, err := env.Parse(pFile)
+	actual, err := evaluator.Evaluate(pFile)
 	require.NoError(t, err)
 	require.Equal(t, expected, actual)
 }

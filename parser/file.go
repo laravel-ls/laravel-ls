@@ -47,10 +47,6 @@ func (f *File) Update(start, end ts.Point, src []byte) error {
 	return f.Tree.parse(f.Src)
 }
 
-func (f *File) Query(pattern string) (*ts.Query, *ts.QueryError) {
-	return ts.NewQuery(f.Tree.tree.Language(), pattern)
-}
-
 func (f *File) FindCaptures(language string, query *ts.Query, captures ...string) (treesitter.CaptureSlice, error) {
 	return f.Tree.FindCaptures(language, query, f.Src, captures...)
 }

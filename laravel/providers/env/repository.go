@@ -3,26 +3,27 @@ package env
 import (
 	"strings"
 
+	"github.com/laravel-ls/laravel-ls/env"
+	"github.com/laravel-ls/laravel-ls/env/evaluator"
 	"github.com/laravel-ls/laravel-ls/parser"
-	"github.com/laravel-ls/laravel-ls/parser/env"
 )
 
 type Repository struct {
-	data map[string]env.Metadata
+	variables map[string]env.Variable
 }
 
 func (r *Repository) Load(file *parser.File) error {
 	r.Clear()
-	data, err := env.Parse(file)
+	data, err := evaluator.Evaluate(file)
 	if err == nil {
-		r.data = data
+		r.variables = data
 	}
 	return err
 }
 
-func (r Repository) Find(key string) map[string]env.Metadata {
-	res := map[string]env.Metadata{}
-	for k, v := range r.data {
+func (r Repository) Find(key string) map[string]env.Variable {
+	res := map[string]env.Variable{}
+	for k, v := range r.variables {
 		if strings.HasPrefix(k, key) {
 			res[k] = v
 		}
@@ -30,8 +31,8 @@ func (r Repository) Find(key string) map[string]env.Metadata {
 	return res
 }
 
-func (r Repository) Get(key string) (meta env.Metadata, found bool) {
-	meta, found = r.data[key]
+func (r Repository) Get(key string) (variable env.Variable, found bool) {
+	variable, found = r.variables[key]
 	return
 }
 
@@ -41,5 +42,5 @@ func (r Repository) Exists(key string) bool {
 }
 
 func (r *Repository) Clear() {
-	r.data = map[string]env.Metadata{}
+	r.variables = map[string]env.Variable{}
 }
