@@ -48,6 +48,8 @@ func (s *State) value(node *ts.Node) (string, error) {
 	switch node.Kind() {
 	case "string":
 		return s.string(treesitter.FirstNamedChild(node))
+	case "variable":
+		return s.variable(node), nil
 	default:
 		return node.Utf8Text(s.file.Src), nil
 	}

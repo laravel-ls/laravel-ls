@@ -53,7 +53,9 @@ MAIL_USERNAME=null
 MAIL_PASSWORD=null
 MAIL_ENCRYPTION="encrypt:${APP_NAME}" #comment
 MAIL_FROM_ADDRESS="hello@example.com"
-MAIL_FROM_NAME="xxx ${MAIL_ENCRYPTION} yyy"`)
+MAIL_FROM_NAME="xxx ${MAIL_ENCRYPTION} yyy"
+NO_STRING=${MAIL_HOST}
+MULTIPLE_VARS="${MAIL_HOST}:${MAIL_PORT}"`)
 
 	expected := map[string]env.Variable{
 		"APP_NAME":          {Value: "some_name", Line: 1, Column: 9},
@@ -65,6 +67,8 @@ MAIL_FROM_NAME="xxx ${MAIL_ENCRYPTION} yyy"`)
 		"MAIL_ENCRYPTION":   {Value: "encrypt:some_name", Line: 9, Column: 16},
 		"MAIL_FROM_ADDRESS": {Value: "hello@example.com", Line: 10, Column: 18},
 		"MAIL_FROM_NAME":    {Value: "xxx encrypt:some_name yyy", Line: 11, Column: 15},
+		"NO_STRING":         {Value: "mailpit", Line: 12, Column: 10},
+		"MULTIPLE_VARS":     {Value: "mailpit:1025", Line: 13, Column: 14},
 	}
 
 	pFile, err := parser.Parse(src, file.TypeEnv)
