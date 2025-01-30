@@ -5,11 +5,12 @@ import (
 
 	"github.com/laravel-ls/laravel-ls/parser"
 	"github.com/laravel-ls/laravel-ls/treesitter"
+	"github.com/laravel-ls/laravel-ls/treesitter/language"
 )
 
 const QueryCaptureAssetFilename = "asset.filename"
 
-func queryAssetCalls(file *parser.File, lang string) treesitter.CaptureSlice {
+func queryAssetCalls(file *parser.File, lang language.Identifier) treesitter.CaptureSlice {
 	query, err := treesitter.GetQuery(lang, "asset")
 	if err != nil {
 		return treesitter.CaptureSlice{}
@@ -22,6 +23,6 @@ func queryAssetCalls(file *parser.File, lang string) treesitter.CaptureSlice {
 }
 
 func Assets(file *parser.File) treesitter.CaptureSlice {
-	return append(queryAssetCalls(file, treesitter.LanguagePhp),
-		queryAssetCalls(file, treesitter.LanguagePhpOnly)...)
+	return append(queryAssetCalls(file, language.PHP),
+		queryAssetCalls(file, language.PHPOnly)...)
 }

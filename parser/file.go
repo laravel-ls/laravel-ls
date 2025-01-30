@@ -3,6 +3,7 @@ package parser
 import (
 	"github.com/laravel-ls/laravel-ls/file"
 	"github.com/laravel-ls/laravel-ls/treesitter"
+	"github.com/laravel-ls/laravel-ls/treesitter/language"
 	"github.com/laravel-ls/laravel-ls/utils"
 
 	ts "github.com/tree-sitter/go-tree-sitter"
@@ -18,7 +19,9 @@ type File struct {
 }
 
 func Parse(content []byte, typ file.Type) (*File, error) {
-	langTree, err := newLanguageTree(treesitter.FiletypeToLanguage(typ), []ts.Range{})
+	lang := language.Get(language.FiletypeToLanguage(typ))
+
+	langTree, err := newLanguageTree(lang, []ts.Range{})
 	if err != nil {
 		return nil, err
 	}
@@ -47,12 +50,12 @@ func (f *File) Update(start, end ts.Point, src []byte) error {
 	return f.Tree.parse(f.Src)
 }
 
-func (f *File) FindCaptures(language string, query *ts.Query, captures ...string) (treesitter.CaptureSlice, error) {
-	return f.Tree.FindCaptures(language, query, f.Src, captures...)
+func (f *File) FindCaptures(lang language.Identifier, query *ts.Query, captures ...string) (treesitter.CaptureSlice, error) {
+	return f.Tree.FindCaptures(lang, query, f.Src, captures...)
 }
 
-func (f *File) NodeMatchesCapture(language string, query *ts.Query, capture string, node *ts.Node) bool {
-	captures, err := f.FindCaptures(language, query, capture)
+func (f *File) NodeMatchesCapture(lang language.Identifier, query *ts.Query, capture string, node *ts.Node) bool {
+	captures, err := f.FindCaptures(lang, query, capture)
 	if err != nil {
 		return false
 	}

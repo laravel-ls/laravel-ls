@@ -6,6 +6,7 @@ import (
 	"github.com/laravel-ls/laravel-ls/treesitter"
 	"github.com/laravel-ls/laravel-ls/treesitter/debug"
 	"github.com/laravel-ls/laravel-ls/treesitter/injections"
+	"github.com/laravel-ls/laravel-ls/treesitter/language"
 
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
@@ -13,14 +14,14 @@ import (
 type LanguageTree struct {
 	parser     *ts.Parser
 	tree       *ts.Tree
-	language   string
+	language   *language.Language
 	ranges     []ts.Range
 	childTrees []*LanguageTree
 }
 
-func newLanguageTree(language string, ranges []ts.Range) (*LanguageTree, error) {
+func newLanguageTree(language *language.Language, ranges []ts.Range) (*LanguageTree, error) {
 	parser := ts.NewParser()
-	err := parser.SetLanguage(treesitter.GetLanguage(language))
+	err := parser.SetLanguage(language.TSObject())
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +70,7 @@ func (t *LanguageTree) parse(source []byte) error {
 }
 
 func (t *LanguageTree) parseInjections(source []byte) error {
-	query, err := treesitter.GetInjectionQuery(t.language)
+	query, err := treesitter.GetInjectionQuery(t.language.ID())
 	if err != nil {
 		if err == treesitter.ErrQueryNotFound {
 			return nil
@@ -80,14 +81,20 @@ func (t *LanguageTree) parseInjections(source []byte) error {
 	childTrees := []*LanguageTree{}
 
 	for _, injection := range injections.Query(query, t.tree.RootNode(), source) {
+		lang_id := language.Identifier(injection.Language)
+		print(lang_id, lang_id.Valid())
+		if !lang_id.Valid() {
+			continue
+		}
+
 		if injection.Combined {
-			if tree := findTreeForLanguage(injection.Language, childTrees); tree != nil {
+			if tree := findTreeForLanguage(lang_id, childTrees); tree != nil {
 				tree.ranges = append(tree.ranges, injection.Range)
 				continue
 			}
 		}
 
-		tree, err := newLanguageTree(injection.Language, []ts.Range{injection.Range})
+		tree, err := newLanguageTree(lang_id.Language(), []ts.Range{injection.Range})
 		if err != nil {
 			return err
 		}
@@ -107,20 +114,20 @@ func (t *LanguageTree) parseInjections(source []byte) error {
 }
 
 // Get all trees for a particular language
-func (t LanguageTree) GetLanguageTrees(language string) []*LanguageTree {
+func (t LanguageTree) GetLanguageTrees(lang_id language.Identifier) []*LanguageTree {
 	results := []*LanguageTree{}
 
-	if t.language == language {
+	if t.language.ID() == lang_id {
 		results = append(results, &t)
 	}
 
 	for _, tree := range t.childTrees {
-		results = append(results, tree.GetLanguageTrees(language)...)
+		results = append(results, tree.GetLanguageTrees(lang_id)...)
 	}
 	return results
 }
 
-func (t LanguageTree) FindCaptures(language string, query *ts.Query, source []byte, captures ...string) (treesitter.CaptureSlice, error) {
+func (t LanguageTree) FindCaptures(lang_id language.Identifier, query *ts.Query, source []byte, captures ...string) (treesitter.CaptureSlice, error) {
 	// Build a map of index name pairs.
 	captureMap := map[uint]string{}
 
@@ -137,7 +144,7 @@ func (t LanguageTree) FindCaptures(language string, query *ts.Query, source []by
 	defer cursor.Close()
 
 	results := []treesitter.Capture{}
-	for _, tree := range t.GetLanguageTrees(language) {
+	for _, tree := range t.GetLanguageTrees(lang_id) {
 		matches := cursor.Matches(query, tree.Root(), source)
 		for it := matches.Next(); it != nil; it = matches.Next() {
 			for _, capture := range it.Captures {
@@ -158,22 +165,22 @@ func (t LanguageTree) FindCaptures(language string, query *ts.Query, source []by
 }
 
 // Find all trees of a given language that includes the node
-func (t *LanguageTree) GetLanguageTreesWithNode(language string, node *ts.Node) []*LanguageTree {
+func (t *LanguageTree) GetLanguageTreesWithNode(id language.Identifier, node *ts.Node) []*LanguageTree {
 	results := []*LanguageTree{}
 
-	if t.language == language && treesitter.RangeOverlap(t.Root().Range(), node.Range()) {
+	if t.language.ID() == id && treesitter.RangeOverlap(t.Root().Range(), node.Range()) {
 		results = append(results, t)
 	}
 
 	for _, tree := range t.childTrees {
-		results = append(results, tree.GetLanguageTreesWithNode(language, node)...)
+		results = append(results, tree.GetLanguageTreesWithNode(id, node)...)
 	}
 	return results
 }
 
-func findTreeForLanguage(language string, trees []*LanguageTree) *LanguageTree {
+func findTreeForLanguage(id language.Identifier, trees []*LanguageTree) *LanguageTree {
 	for _, tree := range trees {
-		if tree.language == language {
+		if tree.language.ID() == id {
 			return tree
 		}
 	}
@@ -189,7 +196,7 @@ func VisualizeLanguageTree(tree *LanguageTree) string {
 }
 
 func visualizeLanguageTreeInner(printer debug.Print, tree *LanguageTree, parent *ts.Node, depth uint) string {
-	str := printer.Indent(depth) + "<" + tree.language
+	str := printer.Indent(depth) + "<" + tree.language.Name()
 	if parent != nil {
 		str += " " + debug.FormatNode(parent)
 	}
@@ -206,7 +213,7 @@ func visualizeLanguageTreeInner(printer debug.Print, tree *LanguageTree, parent 
 		}
 	}
 
-	str += printer.Indent(depth) + "</" + tree.language + ">\n"
+	str += printer.Indent(depth) + "</" + tree.language.Name() + ">\n"
 
 	return str
 }
