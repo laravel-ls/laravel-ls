@@ -5,13 +5,14 @@ import (
 
 	"github.com/laravel-ls/laravel-ls/parser"
 	"github.com/laravel-ls/laravel-ls/treesitter"
+	"github.com/laravel-ls/laravel-ls/treesitter/language"
 
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
 
 const QueryCaptureEnvKey = "env.key"
 
-func queryEnvCalls(file *parser.File, lang string) treesitter.CaptureSlice {
+func queryEnvCalls(file *parser.File, lang language.Identifier) treesitter.CaptureSlice {
 	query, err := treesitter.GetQuery(lang, "env")
 	if err != nil {
 		return treesitter.CaptureSlice{}
@@ -24,8 +25,8 @@ func queryEnvCalls(file *parser.File, lang string) treesitter.CaptureSlice {
 }
 
 func EnvCalls(file *parser.File) treesitter.CaptureSlice {
-	return append(queryEnvCalls(file, treesitter.LanguagePhp),
-		queryEnvCalls(file, treesitter.LanguagePhpOnly)...)
+	return append(queryEnvCalls(file, language.PHP),
+		queryEnvCalls(file, language.PHPOnly)...)
 }
 
 // Check if a env call has a default value.

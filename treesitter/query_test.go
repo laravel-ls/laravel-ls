@@ -4,14 +4,14 @@ import (
 	"testing"
 
 	"github.com/laravel-ls/laravel-ls/treesitter"
+	"github.com/laravel-ls/laravel-ls/treesitter/language"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetInjectionQuery(t *testing.T) {
-	_, err := treesitter.GetInjectionQuery("php")
+	_, err := treesitter.GetInjectionQuery(language.PHP)
 	assert.NoError(t, err)
 
-	// It be weird if this language is included.
-	_, err = treesitter.GetInjectionQuery("pascal")
+	_, err = treesitter.GetInjectionQuery(language.PHPOnly)
 	assert.Error(t, err)
 }

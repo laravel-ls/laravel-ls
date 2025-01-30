@@ -3,7 +3,7 @@ package parser
 import (
 	"testing"
 
-	"github.com/laravel-ls/laravel-ls/treesitter"
+	"github.com/laravel-ls/laravel-ls/treesitter/language"
 
 	"github.com/stretchr/testify/assert"
 	ts "github.com/tree-sitter/go-tree-sitter"
@@ -15,14 +15,14 @@ func TestLanguageTree_Parse(t *testing.T) {
 	<?php $var = 2; ?>
 </div>`)
 
-	tree, err := newLanguageTree(treesitter.LanguagePhp, []ts.Range{})
+	tree, err := newLanguageTree(language.PHP.Language(), []ts.Range{})
 	assert.NoError(t, err)
 	assert.NoError(t, tree.parse(src))
 
 	assert.Len(t, tree.childTrees, 1)
 
 	assert.Equal(t, "(program (text) (php_tag) (expression_statement (assignment_expression left: (variable_name (name)) right: (integer))) (text_interpolation (text)))", tree.tree.RootNode().ToSexp())
-	assert.Equal(t, "php", tree.language)
+	assert.Equal(t, language.PHP, tree.language.ID())
 	assert.Equal(t, "(document (element (start_tag (tag_name)) (end_tag (tag_name))))", tree.childTrees[0].tree.RootNode().ToSexp())
 }
 
@@ -33,14 +33,14 @@ func TestLanguageTree_UpdateThatRemovesInjectionRegion(t *testing.T) {
 
 	changedSrc := []byte(`<?php $var = 2; ?>`)
 
-	tree, err := newLanguageTree(treesitter.LanguagePhp, []ts.Range{})
+	tree, err := newLanguageTree(language.PHP.Language(), []ts.Range{})
 	assert.NoError(t, err)
 	assert.NoError(t, tree.parse(src))
 
 	assert.Len(t, tree.childTrees, 1)
 
 	assert.Equal(t, "(program (text) (php_tag) (expression_statement (assignment_expression left: (variable_name (name)) right: (integer))) (text_interpolation (text)))", tree.tree.RootNode().ToSexp())
-	assert.Equal(t, "php", tree.language)
+	assert.Equal(t, language.PHP, tree.language.ID())
 	assert.Equal(t, "(document (element (start_tag (tag_name)) (end_tag (tag_name))))", tree.childTrees[0].tree.RootNode().ToSexp())
 
 	tree.update(&ts.InputEdit{
@@ -85,5 +85,5 @@ func TestLanguageTree_UpdateThatRemovesInjectionRegion(t *testing.T) {
 	assert.Len(t, tree.childTrees, 0)
 
 	assert.Equal(t, "(program (php_tag) (expression_statement (assignment_expression left: (variable_name (name)) right: (integer))) (text_interpolation))", tree.tree.RootNode().ToSexp())
-	assert.Equal(t, "php", tree.language)
+	assert.Equal(t, language.PHP, tree.language.ID())
 }

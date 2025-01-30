@@ -7,6 +7,7 @@ import (
 	"path"
 
 	"github.com/laravel-ls/laravel-ls/treesitter/assets"
+	"github.com/laravel-ls/laravel-ls/treesitter/language"
 	"github.com/laravel-ls/laravel-ls/utils/cache"
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
@@ -25,8 +26,8 @@ var fileAlias = map[string]string{
 var ErrQueryNotFound error = errors.New("query not found")
 
 // Read a query from file
-func ReadQueryFromFile(lang, name string) (string, error) {
-	filename := path.Join(lang, name+".scm")
+func ReadQueryFromFile(lang *language.Language, name string) (string, error) {
+	filename := path.Join(lang.Name(), name+".scm")
 
 	// Resolve any alias
 	if alias, ok := fileAlias[filename]; ok {
@@ -42,13 +43,13 @@ func ReadQueryFromFile(lang, name string) (string, error) {
 	return string(source), err
 }
 
-func GetQuery(lang, name string) (*ts.Query, error) {
-	key := fmt.Sprintf("%s:%s", lang, name)
+func GetQuery(lang_id language.Identifier, name string) (*ts.Query, error) {
+	key := fmt.Sprintf("%s:%s", lang_id.String(), name)
 
 	return queryCache.Remember(key, func(string) (*ts.Query, error) {
-		tsLang := GetLanguage(lang)
-		if tsLang == nil {
-			return nil, ErrLangNotSupported
+		lang := language.Get(lang_id)
+		if lang == nil {
+			return nil, language.ErrNotSupported
 		}
 
 		source, err := ReadQueryFromFile(lang, name)
@@ -56,7 +57,7 @@ func GetQuery(lang, name string) (*ts.Query, error) {
 			return nil, err
 		}
 
-		query, tsErr := ts.NewQuery(tsLang, source)
+		query, tsErr := lang.Query(source)
 		// This error checking is needed because of:
 		// https://go.dev/doc/faq#nil_error
 		if tsErr != nil {
@@ -66,7 +67,7 @@ func GetQuery(lang, name string) (*ts.Query, error) {
 	})
 }
 
-func GetInjectionQuery(lang string) (*ts.Query, error) {
+func GetInjectionQuery(lang language.Identifier) (*ts.Query, error) {
 	return GetQuery(lang, "injections")
 }
 

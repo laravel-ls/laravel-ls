@@ -5,11 +5,12 @@ import (
 
 	"github.com/laravel-ls/laravel-ls/parser"
 	"github.com/laravel-ls/laravel-ls/treesitter"
+	"github.com/laravel-ls/laravel-ls/treesitter/language"
 )
 
 const QueryCaptureViewName = "view.name"
 
-func findViewNames(file *parser.File, lang string) treesitter.CaptureSlice {
+func findViewNames(file *parser.File, lang language.Identifier) treesitter.CaptureSlice {
 	query, err := treesitter.GetQuery(lang, "view")
 	if err != nil {
 		return treesitter.CaptureSlice{}
@@ -22,6 +23,6 @@ func findViewNames(file *parser.File, lang string) treesitter.CaptureSlice {
 }
 
 func ViewNames(file *parser.File) treesitter.CaptureSlice {
-	return append(findViewNames(file, treesitter.LanguagePhp),
-		findViewNames(file, treesitter.LanguagePhpOnly)...)
+	return append(findViewNames(file, language.PHP),
+		findViewNames(file, language.PHPOnly)...)
 }

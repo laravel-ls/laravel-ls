@@ -5,6 +5,7 @@ import (
 
 	"github.com/laravel-ls/laravel-ls/treesitter"
 	"github.com/laravel-ls/laravel-ls/treesitter/injections"
+	"github.com/laravel-ls/laravel-ls/treesitter/language"
 
 	"github.com/stretchr/testify/assert"
 	ts "github.com/tree-sitter/go-tree-sitter"
@@ -16,16 +17,16 @@ func TestQuery(t *testing.T) {
 <?php echo "hello world" ?>
 </div>`)
 
-	lang := treesitter.GetLanguage(treesitter.LanguagePhp)
+	lang := language.Get(language.PHP)
 
 	parser := ts.NewParser()
-	assert.NoError(t, parser.SetLanguage(lang))
+	assert.NoError(t, parser.SetLanguage(lang.TSObject()))
 	tree := parser.Parse(src, nil)
 
-	injectionQuery, err := treesitter.ReadQueryFromFile(treesitter.LanguagePhp, "injections")
+	injectionQuery, err := treesitter.ReadQueryFromFile(lang, "injections")
 	assert.Nil(t, err)
 
-	query, err := ts.NewQuery(lang, injectionQuery)
+	query, err := lang.Query(injectionQuery)
 	assert.Nil(t, err)
 
 	expected := []injections.Capture{
@@ -73,16 +74,16 @@ func TestQuery_Blade(t *testing.T) {
 	@include('some.file')
 	</div>`)
 
-	lang := treesitter.GetLanguage(treesitter.LanguageBlade)
+	lang := language.Get(language.Blade)
 
 	parser := ts.NewParser()
-	assert.NoError(t, parser.SetLanguage(lang))
+	assert.NoError(t, parser.SetLanguage(lang.TSObject()))
 	tree := parser.Parse(src, nil)
 
-	injectionQuery, err := treesitter.ReadQueryFromFile(treesitter.LanguageBlade, "injections")
+	injectionQuery, err := treesitter.ReadQueryFromFile(lang, "injections")
 	assert.Nil(t, err)
 
-	query, err := ts.NewQuery(lang, injectionQuery)
+	query, err := lang.Query(injectionQuery)
 	assert.Nil(t, err)
 
 	expected := []injections.Capture{
