@@ -70,7 +70,7 @@ func Run() error {
 	cmd := cobra.Command{
 		Use:     program.Name,
 		Short:   "Language server for Laravel",
-		Version: program.Version,
+		Version: program.Version(),
 		RunE:    run,
 	}
 

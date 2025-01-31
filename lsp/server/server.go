@@ -303,7 +303,7 @@ func (s *Server) HandleInitialize(params protocol.InitializeParams) (protocol.In
 		},
 		ServerInfo: &protocol.ServerInfo{
 			Name:    program.Name,
-			Version: program.Version,
+			Version: program.Version(),
 		},
 	}, nil
 }
