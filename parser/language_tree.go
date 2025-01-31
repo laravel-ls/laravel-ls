@@ -164,6 +164,14 @@ func (t LanguageTree) FindCaptures(lang_id language.Identifier, query *ts.Query,
 	return results, nil
 }
 
+func (t LanguageTree) FindTags(lang_id language.Identifier, source []byte, tags ...string) (treesitter.CaptureSlice, error) {
+	query, err := treesitter.GetTagsQuery(lang_id)
+	if err != nil {
+		return nil, err
+	}
+	return t.FindCaptures(lang_id, query, source, tags...)
+}
+
 // Find all trees of a given language that includes the node
 func (t *LanguageTree) GetLanguageTreesWithNode(id language.Identifier, node *ts.Node) []*LanguageTree {
 	results := []*LanguageTree{}

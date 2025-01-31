@@ -54,6 +54,10 @@ func (f *File) FindCaptures(lang language.Identifier, query *ts.Query, captures 
 	return f.Tree.FindCaptures(lang, query, f.Src, captures...)
 }
 
+func (f *File) FindTags(lang language.Identifier, tags ...string) (treesitter.CaptureSlice, error) {
+	return f.Tree.FindTags(lang, f.Src, tags...)
+}
+
 func (f *File) NodeMatchesCapture(lang language.Identifier, query *ts.Query, capture string, node *ts.Node) bool {
 	captures, err := f.FindCaptures(lang, query, capture)
 	if err != nil {

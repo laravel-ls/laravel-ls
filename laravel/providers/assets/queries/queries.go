@@ -11,11 +11,7 @@ import (
 const QueryCaptureAssetFilename = "asset.filename"
 
 func queryAssetCalls(file *parser.File, lang language.Identifier) treesitter.CaptureSlice {
-	query, err := treesitter.GetQuery(lang, "asset")
-	if err != nil {
-		return treesitter.CaptureSlice{}
-	}
-	r, err := file.FindCaptures(lang, query, QueryCaptureAssetFilename)
+	r, err := file.FindTags(lang, QueryCaptureAssetFilename)
 	if err != nil {
 		return treesitter.CaptureSlice{}
 	}
