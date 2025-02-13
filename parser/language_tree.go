@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/laravel-ls/laravel-ls/treesitter"
-	"github.com/laravel-ls/laravel-ls/treesitter/debug"
 	"github.com/laravel-ls/laravel-ls/treesitter/injections"
 	"github.com/laravel-ls/laravel-ls/treesitter/language"
 
@@ -185,44 +184,4 @@ func findTreeForLanguage(id language.Identifier, trees []*LanguageTree) *Languag
 		}
 	}
 	return nil
-}
-
-func VisualizeLanguageTree(tree *LanguageTree) string {
-	printer := debug.Print{
-		IndentSize: 2,
-	}
-
-	return visualizeLanguageTreeInner(printer, tree, nil, 0)
-}
-
-func visualizeLanguageTreeInner(printer debug.Print, tree *LanguageTree, parent *ts.Node, depth uint) string {
-	str := printer.Indent(depth) + "<" + tree.language.Name()
-	if parent != nil {
-		str += " " + debug.FormatNode(parent)
-	}
-	str += ">\n"
-
-	str += printer.Indent(depth) + debug.FormatNode(tree.tree.RootNode()) + "\n"
-
-	for i := uint(0); i < tree.tree.RootNode().NamedChildCount(); i++ {
-		node := tree.tree.RootNode().NamedChild(i)
-		if childStr, ok := visualizeChildTrees(printer, node, tree.childTrees, depth); ok {
-			str += childStr
-		} else {
-			str += printer.Inner(node, depth+1)
-		}
-	}
-
-	str += printer.Indent(depth) + "</" + tree.language.Name() + ">\n"
-
-	return str
-}
-
-func visualizeChildTrees(printer debug.Print, node *ts.Node, trees []*LanguageTree, depth uint) (string, bool) {
-	for _, childTree := range trees {
-		if childTree.InRange(node.Range()) {
-			return visualizeLanguageTreeInner(printer, childTree, node, depth+1), true
-		}
-	}
-	return "", false
 }
