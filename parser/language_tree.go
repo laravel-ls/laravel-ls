@@ -81,7 +81,6 @@ func (langTree *LanguageTree) parseInjections(source []byte) error {
 
 	for _, injection := range injections.Query(query, langTree.tree.RootNode(), source) {
 		langID := language.Identifier(injection.Language)
-		print(langID, langID.Valid())
 		if !langID.Valid() {
 			continue
 		}
