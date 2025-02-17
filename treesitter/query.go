@@ -43,11 +43,11 @@ func ReadQueryFromFile(lang *language.Language, name string) (string, error) {
 	return string(source), err
 }
 
-func GetQuery(lang_id language.Identifier, name string) (*ts.Query, error) {
-	key := fmt.Sprintf("%s:%s", lang_id.String(), name)
+func GetQuery(langID language.Identifier, name string) (*ts.Query, error) {
+	key := fmt.Sprintf("%s:%s", langID.String(), name)
 
 	return queryCache.Remember(key, func(string) (*ts.Query, error) {
-		lang := language.Get(lang_id)
+		lang := language.Get(langID)
 		if lang == nil {
 			return nil, language.ErrNotSupported
 		}

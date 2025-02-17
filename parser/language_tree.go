@@ -33,12 +33,12 @@ func newLanguageTree(language *language.Language, ranges []ts.Range) (*LanguageT
 	}, nil
 }
 
-func (t *LanguageTree) Root() *ts.Node {
-	return t.tree.RootNode()
+func (langTree *LanguageTree) Root() *ts.Node {
+	return langTree.tree.RootNode()
 }
 
-func (t *LanguageTree) InRange(r ts.Range) bool {
-	for _, c := range t.ranges {
+func (langTree *LanguageTree) InRange(r ts.Range) bool {
+	for _, c := range langTree.ranges {
 		if treesitter.RangeOverlap(c, r) {
 			return true
 		}
@@ -46,30 +46,30 @@ func (t *LanguageTree) InRange(r ts.Range) bool {
 	return false
 }
 
-func (t *LanguageTree) update(edit *ts.InputEdit) {
-	t.tree.Edit(edit)
+func (langTree *LanguageTree) update(edit *ts.InputEdit) {
+	langTree.tree.Edit(edit)
 
 	// Update all children
-	for _, child := range t.childTrees {
+	for _, child := range langTree.childTrees {
 		child.update(edit)
 	}
 }
 
-func (t *LanguageTree) parse(source []byte) error {
+func (langTree *LanguageTree) parse(source []byte) error {
 	// Parse main tree first.
-	err := t.parser.SetIncludedRanges(t.ranges)
+	err := langTree.parser.SetIncludedRanges(langTree.ranges)
 	if err != nil {
 		return err
 	}
 
-	t.tree = t.parser.Parse(source, t.tree)
+	langTree.tree = langTree.parser.Parse(source, langTree.tree)
 
 	// Then parse any injections
-	return t.parseInjections(source)
+	return langTree.parseInjections(source)
 }
 
-func (t *LanguageTree) parseInjections(source []byte) error {
-	query, err := treesitter.GetInjectionQuery(t.language.ID())
+func (langTree *LanguageTree) parseInjections(source []byte) error {
+	query, err := treesitter.GetInjectionQuery(langTree.language.ID())
 	if err != nil {
 		if err == treesitter.ErrQueryNotFound {
 			return nil
@@ -79,21 +79,21 @@ func (t *LanguageTree) parseInjections(source []byte) error {
 
 	childTrees := []*LanguageTree{}
 
-	for _, injection := range injections.Query(query, t.tree.RootNode(), source) {
-		lang_id := language.Identifier(injection.Language)
-		print(lang_id, lang_id.Valid())
-		if !lang_id.Valid() {
+	for _, injection := range injections.Query(query, langTree.tree.RootNode(), source) {
+		langID := language.Identifier(injection.Language)
+		print(langID, langID.Valid())
+		if !langID.Valid() {
 			continue
 		}
 
 		if injection.Combined {
-			if tree := findTreeForLanguage(lang_id, childTrees); tree != nil {
+			if tree := findTreeForLanguage(langID, childTrees); tree != nil {
 				tree.ranges = append(tree.ranges, injection.Range)
 				continue
 			}
 		}
 
-		tree, err := newLanguageTree(lang_id.Language(), []ts.Range{injection.Range})
+		tree, err := newLanguageTree(langID.Language(), []ts.Range{injection.Range})
 		if err != nil {
 			return err
 		}
@@ -102,8 +102,8 @@ func (t *LanguageTree) parseInjections(source []byte) error {
 	}
 
 	// Parse all children
-	t.childTrees = childTrees
-	for _, child := range t.childTrees {
+	langTree.childTrees = childTrees
+	for _, child := range langTree.childTrees {
 		if err := child.parse(source); err != nil {
 			return err
 		}
@@ -113,20 +113,20 @@ func (t *LanguageTree) parseInjections(source []byte) error {
 }
 
 // Get all trees for a particular language
-func (t LanguageTree) GetLanguageTrees(lang_id language.Identifier) []*LanguageTree {
+func (langTree LanguageTree) GetLanguageTrees(langID language.Identifier) []*LanguageTree {
 	results := []*LanguageTree{}
 
-	if t.language.ID() == lang_id {
-		results = append(results, &t)
+	if langTree.language.ID() == langID {
+		results = append(results, &langTree)
 	}
 
-	for _, tree := range t.childTrees {
-		results = append(results, tree.GetLanguageTrees(lang_id)...)
+	for _, tree := range langTree.childTrees {
+		results = append(results, tree.GetLanguageTrees(langID)...)
 	}
 	return results
 }
 
-func (t LanguageTree) FindCaptures(lang_id language.Identifier, query *ts.Query, source []byte, captures ...string) (treesitter.CaptureSlice, error) {
+func (langTree LanguageTree) FindCaptures(langID language.Identifier, query *ts.Query, source []byte, captures ...string) (treesitter.CaptureSlice, error) {
 	// Build a map of index name pairs.
 	captureMap := map[uint]string{}
 
@@ -143,7 +143,7 @@ func (t LanguageTree) FindCaptures(lang_id language.Identifier, query *ts.Query,
 	defer cursor.Close()
 
 	results := []treesitter.Capture{}
-	for _, tree := range t.GetLanguageTrees(lang_id) {
+	for _, tree := range langTree.GetLanguageTrees(langID) {
 		matches := cursor.Matches(query, tree.Root(), source)
 		for it := matches.Next(); it != nil; it = matches.Next() {
 			for _, capture := range it.Captures {
@@ -164,14 +164,14 @@ func (t LanguageTree) FindCaptures(lang_id language.Identifier, query *ts.Query,
 }
 
 // Find all trees of a given language that includes the node
-func (t *LanguageTree) GetLanguageTreesWithNode(id language.Identifier, node *ts.Node) []*LanguageTree {
+func (langTree *LanguageTree) GetLanguageTreesWithNode(id language.Identifier, node *ts.Node) []*LanguageTree {
 	results := []*LanguageTree{}
 
-	if t.language.ID() == id && treesitter.RangeOverlap(t.Root().Range(), node.Range()) {
-		results = append(results, t)
+	if langTree.language.ID() == id && treesitter.RangeOverlap(langTree.Root().Range(), node.Range()) {
+		results = append(results, langTree)
 	}
 
-	for _, tree := range t.childTrees {
+	for _, tree := range langTree.childTrees {
 		results = append(results, tree.GetLanguageTreesWithNode(id, node)...)
 	}
 	return results
