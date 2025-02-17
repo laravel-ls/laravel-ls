@@ -7,6 +7,8 @@
     |
     <a href="#features">Features</a>
     |
+    <a href="#install">Install</a>
+    |
     <a href="#build">Building</a>
 </p>
 
@@ -100,6 +102,22 @@ asset('main.css');
 - Inertia support
 - Eloquent support
 - Jump to test file from class.
+
+## Install
+
+The program can be installed via go:
+
+```sh
+ $ go install github.com/laravel-ls/laravel-ls/cmd/laravel-ls@latest
+```
+
+And if you have added *gopath* (`$(go env GOPATH)/bin`) to your shell's `PATH`. You should be able to just run the server with:
+
+```sh
+$ laravel-ls
+```
+
+See the official documentation of [go install](https://go.dev/ref/mod#go-install)
 
 ## Build
 
