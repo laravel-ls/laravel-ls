@@ -108,13 +108,13 @@ asset('main.css');
 The program can be installed via go:
 
 ```sh
- $ go install github.com/laravel-ls/laravel-ls/cmd/laravel-ls@latest
+go install github.com/laravel-ls/laravel-ls/cmd/laravel-ls@latest
 ```
 
-And if you have added *gopath* (`$(go env GOPATH)/bin`) to your shell's `PATH`. You should be able to just run the server with:
+And if you have added [GOPATH](https://pkg.go.dev/cmd/go#hdr-GOPATH_environment_variable) to your shell's `PATH`. You should be able to just run the server with:
 
 ```sh
-$ laravel-ls
+laravel-ls
 ```
 
 See the official documentation of [go install](https://go.dev/ref/mod#go-install)
