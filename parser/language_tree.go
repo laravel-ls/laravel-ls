@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"fmt"
-
 	"github.com/laravel-ls/laravel-ls/treesitter"
 	"github.com/laravel-ls/laravel-ls/treesitter/injections"
 	"github.com/laravel-ls/laravel-ls/treesitter/language"
@@ -11,11 +9,12 @@ import (
 )
 
 type LanguageTree struct {
-	parser     *ts.Parser
-	tree       *ts.Tree
-	language   *language.Language
-	ranges     []ts.Range
-	childTrees []*LanguageTree
+	parser       *ts.Parser
+	tree         *ts.Tree
+	language     *language.Language
+	ranges       []ts.Range
+	childTrees   []*LanguageTree
+	captureCache map[*ts.Query]treesitter.CaptureSlice
 }
 
 func newLanguageTree(language *language.Language, ranges []ts.Range) (*LanguageTree, error) {
@@ -26,10 +25,11 @@ func newLanguageTree(language *language.Language, ranges []ts.Range) (*LanguageT
 	}
 
 	return &LanguageTree{
-		parser:     parser,
-		ranges:     ranges,
-		language:   language,
-		childTrees: []*LanguageTree{},
+		parser:       parser,
+		ranges:       ranges,
+		language:     language,
+		childTrees:   []*LanguageTree{},
+		captureCache: map[*ts.Query]treesitter.CaptureSlice{},
 	}, nil
 }
 
@@ -63,6 +63,9 @@ func (langTree *LanguageTree) parse(source []byte) error {
 	}
 
 	langTree.tree = langTree.parser.Parse(source, langTree.tree)
+
+	// invalidate all capture caches.
+	langTree.captureCache = map[*ts.Query]treesitter.CaptureSlice{}
 
 	// Then parse any injections
 	return langTree.parseInjections(source)
@@ -112,54 +115,60 @@ func (langTree *LanguageTree) parseInjections(source []byte) error {
 }
 
 // Get all trees for a particular language
-func (langTree LanguageTree) GetLanguageTrees(langID language.Identifier) []*LanguageTree {
+func (t LanguageTree) GetLanguageTrees(lang_id language.Identifier) []*LanguageTree {
 	results := []*LanguageTree{}
 
-	if langTree.language.ID() == langID {
-		results = append(results, &langTree)
+	if t.language.ID() == lang_id {
+		results = append(results, &t)
 	}
 
-	for _, tree := range langTree.childTrees {
-		results = append(results, tree.GetLanguageTrees(langID)...)
+	for _, tree := range t.childTrees {
+		results = append(results, tree.GetLanguageTrees(lang_id)...)
 	}
 	return results
 }
 
 func (langTree LanguageTree) FindCaptures(langID language.Identifier, query *ts.Query, source []byte, captures ...string) (treesitter.CaptureSlice, error) {
-	// Build a map of index name pairs.
-	captureMap := map[uint]string{}
-
-	for _, capture := range captures {
-		index, ok := query.CaptureIndexForName(capture)
-		if !ok {
-			return nil, fmt.Errorf("capture '%s' is not present in query", capture)
-		}
-
-		captureMap[index] = capture
+	// return cached result on hit.
+	if cache, found := langTree.captureCache[query]; found {
+		return cache.Name(captures...), nil
 	}
+
+	captureMap := query.CaptureNames()
 
 	cursor := ts.NewQueryCursor()
 	defer cursor.Close()
 
-	results := []treesitter.Capture{}
+	results := treesitter.CaptureSlice{}
 	for _, tree := range langTree.GetLanguageTrees(langID) {
 		matches := cursor.Matches(query, tree.Root(), source)
 		for it := matches.Next(); it != nil; it = matches.Next() {
 			for _, capture := range it.Captures {
-				name, ok := captureMap[uint(capture.Index)]
-				if !ok {
+
+				// Just to be safe.
+				if int(capture.Index) > len(captureMap) {
 					continue
 				}
 
 				results = append(results, treesitter.Capture{
-					Name: name,
+					Name: captureMap[capture.Index],
 					Node: capture.Node,
 				})
 			}
 		}
 	}
 
-	return results, nil
+	// update cache
+	langTree.captureCache[query] = results
+	return results.Name(captures...), nil
+}
+
+func (langTree LanguageTree) FindTags(langID language.Identifier, source []byte, tags ...string) (treesitter.CaptureSlice, error) {
+	query, err := treesitter.GetTagsQuery(langID)
+	if err != nil {
+		return nil, err
+	}
+	return langTree.FindCaptures(langID, query, source, tags...)
 }
 
 // Find all trees of a given language that includes the node

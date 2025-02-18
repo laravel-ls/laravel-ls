@@ -13,11 +13,7 @@ import (
 const QueryCaptureEnvKey = "env.key"
 
 func queryEnvCalls(file *parser.File, lang language.Identifier) treesitter.CaptureSlice {
-	query, err := treesitter.GetQuery(lang, "env")
-	if err != nil {
-		return treesitter.CaptureSlice{}
-	}
-	r, err := file.FindCaptures(lang, query, QueryCaptureEnvKey)
+	r, err := file.FindTags(lang, QueryCaptureEnvKey)
 	if err != nil {
 		return treesitter.CaptureSlice{}
 	}

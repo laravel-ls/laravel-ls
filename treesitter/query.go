@@ -14,24 +14,15 @@ import (
 
 var queryCache = cache.New[*ts.Query]()
 
-// A map of "virtual files" that points to some file that actually exist.
-// this is a hack that's needed because php and php_only are different
-// languages in treesitter (but are logically the same).
-var fileAlias = map[string]string{
-	"php_only/env.scm":   "php/env.scm",
-	"php_only/view.scm":  "php/view.scm",
-	"php_only/asset.scm": "php/asset.scm",
-}
-
 var ErrQueryNotFound error = errors.New("query not found")
 
 // Read a query from file
 func ReadQueryFromFile(lang *language.Language, name string) (string, error) {
 	filename := path.Join(lang.Name(), name+".scm")
 
-	// Resolve any alias
-	if alias, ok := fileAlias[filename]; ok {
-		filename = alias
+	// Hack to use the php tags file for php_only
+	if filename == "php_only/tags.scm" {
+		filename = "php/tags.scm"
 	}
 
 	source, err := assets.FS.ReadFile(assets.QueryPath(filename))
@@ -69,6 +60,10 @@ func GetQuery(langID language.Identifier, name string) (*ts.Query, error) {
 
 func GetInjectionQuery(lang language.Identifier) (*ts.Query, error) {
 	return GetQuery(lang, "injections")
+}
+
+func GetTagsQuery(lang language.Identifier) (*ts.Query, error) {
+	return GetQuery(lang, "tags")
 }
 
 func FreeQueryCache() {

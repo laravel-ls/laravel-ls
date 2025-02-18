@@ -11,11 +11,7 @@ import (
 const QueryCaptureViewName = "view.name"
 
 func findViewNames(file *parser.File, lang language.Identifier) treesitter.CaptureSlice {
-	query, err := treesitter.GetQuery(lang, "view")
-	if err != nil {
-		return treesitter.CaptureSlice{}
-	}
-	r, err := file.FindCaptures(lang, query, QueryCaptureViewName)
+	r, err := file.FindTags(lang, QueryCaptureViewName)
 	if err != nil {
 		return treesitter.CaptureSlice{}
 	}
