@@ -2,6 +2,7 @@ package provider
 
 import (
 	"github.com/laravel-ls/laravel-ls/file"
+	"github.com/laravel-ls/laravel-ls/project"
 )
 
 type Language struct {
@@ -13,6 +14,7 @@ type Language struct {
 }
 
 type Manager struct {
+	project   *project.Project
 	providers []Provider
 	languages map[file.Type]Language
 }
@@ -24,6 +26,13 @@ func NewManager() *Manager {
 }
 
 func (m *Manager) Init(ctx InitContext) {
+	var err error
+
+	m.project, err = project.New(ctx.RootPath)
+	if err != nil {
+		ctx.Logger.WithError(err).Warn("failed to find binary")
+	}
+
 	for _, provider := range m.providers {
 		provider.Init(ctx)
 	}
@@ -70,6 +79,7 @@ func (m *Manager) Register(typ file.Type, provider any) {
 }
 
 func (m *Manager) CodeAction(ctx CodeActionContext) {
+	ctx.Project = m.project
 	if providers, ok := m.languages[ctx.File.Type]; ok {
 		for _, provider := range providers.CodeActionProviders {
 			provider.ResolveCodeAction(ctx)
@@ -78,6 +88,7 @@ func (m *Manager) CodeAction(ctx CodeActionContext) {
 }
 
 func (m *Manager) Completion(ctx CompletionContext) {
+	ctx.Project = m.project
 	if providers, ok := m.languages[ctx.File.Type]; ok {
 		for _, provider := range providers.CompletionProviders {
 			provider.ResolveCompletion(ctx)
@@ -86,6 +97,7 @@ func (m *Manager) Completion(ctx CompletionContext) {
 }
 
 func (m *Manager) Diagnostics(ctx DiagnosticContext) {
+	ctx.Project = m.project
 	if providers, ok := m.languages[ctx.File.Type]; ok {
 		for _, provider := range providers.DiagnosticsProviders {
 			provider.Diagnostic(ctx)
@@ -94,6 +106,7 @@ func (m *Manager) Diagnostics(ctx DiagnosticContext) {
 }
 
 func (m *Manager) ResolveDefinition(context DefinitionContext) {
+	context.Project = m.project
 	if providers, ok := m.languages[context.File.Type]; ok {
 		for _, provider := range providers.DefinitionProviders {
 			provider.ResolveDefinition(context)
@@ -102,6 +115,7 @@ func (m *Manager) ResolveDefinition(context DefinitionContext) {
 }
 
 func (m *Manager) Hover(context HoverContext) {
+	context.Project = m.project
 	if providers, ok := m.languages[context.File.Type]; ok {
 		for _, provider := range providers.HoverProviders {
 			provider.Hover(context)
