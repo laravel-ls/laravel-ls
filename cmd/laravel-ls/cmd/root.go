@@ -8,6 +8,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/laravel-ls/laravel-ls/laravel/providers/app"
 	"github.com/laravel-ls/laravel-ls/laravel/providers/assets"
 	"github.com/laravel-ls/laravel-ls/laravel/providers/env"
 	"github.com/laravel-ls/laravel-ls/laravel/providers/view"
@@ -55,6 +56,7 @@ func run(cmd *cobra.Command, args []string) error {
 	providerManager.Add(view.NewProvider())
 	providerManager.Add(env.NewProvider())
 	providerManager.Add(assets.NewProvider())
+	providerManager.Add(app.NewProvider())
 
 	defer treesitter.FreeQueryCache()
 
