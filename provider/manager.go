@@ -2,6 +2,7 @@ package provider
 
 import (
 	"github.com/laravel-ls/laravel-ls/file"
+	"github.com/laravel-ls/laravel-ls/project"
 )
 
 type Language struct {
@@ -13,6 +14,7 @@ type Language struct {
 }
 
 type Manager struct {
+	project   *project.Project
 	providers []Provider
 	languages map[file.Type]Language
 }
@@ -24,6 +26,13 @@ func NewManager() *Manager {
 }
 
 func (m *Manager) Init(ctx InitContext) {
+	var err error
+
+	m.project, err = project.New(ctx.RootPath)
+	if err != nil {
+		ctx.Logger.WithError(err).Warn("failed to find binary")
+	}
+
 	for _, provider := range m.providers {
 		provider.Init(ctx)
 	}
