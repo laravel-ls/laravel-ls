@@ -1,4 +1,53 @@
 ; --------------------------------------------------
+;  App
+; --------------------------------------------------
+
+; app('key')
+(function_call_expression
+  function: (name) @function (#eq? @function "app")
+  arguments: (arguments
+    . (argument [
+        (string (string_content)?) @app.service
+        (encapsed_string . (string_content) .) @app.service
+        (encapsed_string "\"" . "\"") @app.service
+    ])
+  ))
+
+
+; app()->make('key')
+(member_call_expression
+  object: (
+    function_call_expression
+    function: (name) @object.name (#eq? @object.name "app")
+    arguments: (arguments "(" . ")"))
+  name: (name) @function.name (#eq? @function.name "make" )
+  arguments: (arguments
+    . (argument [
+        (string (string_content)?) @app.service
+        (encapsed_string . (string_content) .) @app.service
+        (encapsed_string "\"" . "\"") @app.service
+    ])
+  ))
+
+; App::make('key')
+; App::bound('key')
+; App::isShared('key')
+(scoped_call_expression
+  scope: [
+    (qualified_name (name) @class)
+    (name) @class
+  ] (#eq? @class "App")
+  name: (name) @method
+  (#any-of? @method "make" "bound" "isShared")
+  arguments: (arguments
+    . (argument [
+        (string (string_content)?) @app.service
+        (encapsed_string . (string_content) .) @app.service
+        (encapsed_string "\"" . "\"") @app.service
+    ])
+  ))
+
+; --------------------------------------------------
 ;  View
 ; --------------------------------------------------
 
