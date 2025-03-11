@@ -109,20 +109,20 @@ func (m *Manager) Diagnostics(ctx DiagnosticContext) {
 	}
 }
 
-func (m *Manager) ResolveDefinition(context DefinitionContext) {
-	context.Project = m.project
-	if providers, ok := m.languages[context.File.Type]; ok {
+func (m *Manager) ResolveDefinition(ctx DefinitionContext) {
+	ctx.Project = m.project
+	if providers, ok := m.languages[ctx.File.Type]; ok {
 		for _, provider := range providers.DefinitionProviders {
-			provider.ResolveDefinition(context)
+			provider.ResolveDefinition(ctx)
 		}
 	}
 }
 
-func (m *Manager) Hover(context HoverContext) {
-	context.Project = m.project
-	if providers, ok := m.languages[context.File.Type]; ok {
+func (m *Manager) Hover(ctx HoverContext) {
+	ctx.Project = m.project
+	if providers, ok := m.languages[ctx.File.Type]; ok {
 		for _, provider := range providers.HoverProviders {
-			provider.Hover(context)
+			provider.Hover(ctx)
 		}
 	}
 }
