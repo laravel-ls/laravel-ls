@@ -38,9 +38,12 @@ func (m *Manager) Init(ctx InitContext) {
 	}
 }
 
-func (m *Manager) Add(provider Provider) {
-	provider.Register(m)
-	m.providers = append(m.providers, provider)
+func (m *Manager) Add(providers ...Provider) *Manager {
+	for _, provider := range providers {
+		provider.Register(m)
+		m.providers = append(m.providers, provider)
+	}
+	return m
 }
 
 func (m *Manager) Register(typ file.Type, provider any) {
