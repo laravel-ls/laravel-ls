@@ -19,10 +19,11 @@ type Manager struct {
 	languages map[file.Type]Language
 }
 
-func NewManager() *Manager {
-	return &Manager{
+func NewManager(providers ...Provider) *Manager {
+	mgr := &Manager{
 		languages: map[file.Type]Language{},
 	}
+	return mgr.Add(providers...)
 }
 
 func (m *Manager) Init(ctx InitContext) {
