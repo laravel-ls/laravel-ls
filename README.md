@@ -65,13 +65,33 @@ Env::get('APP_NAME');
 
 ```php
 config('app.name')
+config()->string('app.name')
+config()->getMany(['app.name'])
 Config::get('app.name')
+Config::getMany(['app.name'])
 ```
 
-- [ ] Hover information shows actual value.
-- [ ] Auto-complete for defined config keys
-- [ ] Go to config file and value location from key
-- [ ] Diagnostics for non defined config keys.
+- [x] Hover information shows actual value.
+- [x] Auto-complete for defined config keys
+- [x] Go to config file and value location from key
+- [x] Diagnostics for non defined config keys.
+
+### Application bindings
+
+```php
+app('db.connection')
+app()->make('db.connection')
+app()->bound('db.connection')
+app()->isShared('db.connection')
+app()->make('db.connection')
+app()->bound('db.connection')
+app()->isShared('db.connection')
+```
+
+- [x] Hover information shows value.
+- [x] Auto-complete for defined bindings
+- [x] Go to location where binding is defined
+- [x] Diagnostics for non defined bindings
 
 ### Assets
 
