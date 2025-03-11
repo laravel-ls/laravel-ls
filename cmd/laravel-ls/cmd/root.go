@@ -53,12 +53,13 @@ func run(cmd *cobra.Command, args []string) error {
 	log.SetOutput(logFile)
 	log.SetLevel(log.DebugLevel)
 
-	providerManager := provider.NewManager()
-	providerManager.Add(view.NewProvider())
-	providerManager.Add(env.NewProvider())
-	providerManager.Add(assets.NewProvider())
-	providerManager.Add(app.NewProvider())
-	providerManager.Add(config.NewProvider())
+	providerManager := provider.NewManager(
+		view.NewProvider(),
+		env.NewProvider(),
+		assets.NewProvider(),
+		app.NewProvider(),
+		config.NewProvider(),
+	)
 
 	defer treesitter.FreeQueryCache()
 
