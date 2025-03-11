@@ -1,0 +1,3 @@
+log:
+  filename: custom.log
+  level: debug
