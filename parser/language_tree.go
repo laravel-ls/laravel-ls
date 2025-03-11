@@ -115,15 +115,15 @@ func (langTree *LanguageTree) parseInjections(source []byte) error {
 }
 
 // Get all trees for a particular language
-func (t LanguageTree) GetLanguageTrees(lang_id language.Identifier) []*LanguageTree {
+func (langTree LanguageTree) GetLanguageTrees(langID language.Identifier) []*LanguageTree {
 	results := []*LanguageTree{}
 
-	if t.language.ID() == lang_id {
-		results = append(results, &t)
+	if langTree.language.ID() == langID {
+		results = append(results, &langTree)
 	}
 
-	for _, tree := range t.childTrees {
-		results = append(results, tree.GetLanguageTrees(lang_id)...)
+	for _, tree := range langTree.childTrees {
+		results = append(results, tree.GetLanguageTrees(langID)...)
 	}
 	return results
 }
