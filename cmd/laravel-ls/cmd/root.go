@@ -2,23 +2,27 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/laravel-ls/laravel-ls/laravel/providers/app"
-	"github.com/laravel-ls/laravel-ls/laravel/providers/assets"
-	"github.com/laravel-ls/laravel-ls/laravel/providers/config"
-	"github.com/laravel-ls/laravel-ls/laravel/providers/env"
-	"github.com/laravel-ls/laravel-ls/laravel/providers/view"
+	"github.com/laravel-ls/laravel-ls/config"
+	appProvider "github.com/laravel-ls/laravel-ls/laravel/providers/app"
+	assetsProvider "github.com/laravel-ls/laravel-ls/laravel/providers/assets"
+	configProvider "github.com/laravel-ls/laravel-ls/laravel/providers/config"
+	envProvider "github.com/laravel-ls/laravel-ls/laravel/providers/env"
+	viewProvider "github.com/laravel-ls/laravel-ls/laravel/providers/view"
 	"github.com/laravel-ls/laravel-ls/lsp/server"
 	"github.com/laravel-ls/laravel-ls/lsp/transport"
 	"github.com/laravel-ls/laravel-ls/program"
 	"github.com/laravel-ls/laravel-ls/provider"
 	"github.com/laravel-ls/laravel-ls/treesitter"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 var basePath string
@@ -35,30 +39,45 @@ func expandHome(path string) string {
 	return path
 }
 
+func openLogFile(filename string) (*os.File, error) {
+	logFilePath := path.Join(basePath, filename)
+	return os.OpenFile(logFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+}
+
 func run(cmd *cobra.Command, args []string) error {
 	basePath = expandHome(basePath)
+
+	// Setup config
+	viper.AddConfigPath(".")
+	viper.AddConfigPath(basePath)
+	viper.ReadInConfig()
+
+	cfg, err := config.Parse(viper.GetViper())
+	if err != nil {
+		return err
+	}
 
 	if err := os.MkdirAll(basePath, 0o755); err != nil {
 		return err
 	}
 
-	logFilePath := path.Join(basePath, "logfile.log")
-
-	logFile, err := os.OpenFile(logFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	logFile, err := openLogFile(cfg.Log.Filename)
 	if err != nil {
 		return err
 	}
 	defer logFile.Close()
 
 	log.SetOutput(logFile)
-	log.SetLevel(log.DebugLevel)
+	log.SetLevel(cfg.Log.Level)
+
+	log.WithField("file", viper.ConfigFileUsed()).Debug("config file used.")
 
 	providerManager := provider.NewManager(
-		view.NewProvider(),
-		env.NewProvider(),
-		assets.NewProvider(),
-		app.NewProvider(),
-		config.NewProvider(),
+		viewProvider.NewProvider(),
+		envProvider.NewProvider(),
+		assetsProvider.NewProvider(),
+		appProvider.NewProvider(),
+		configProvider.NewProvider(),
 	)
 
 	defer treesitter.FreeQueryCache()
@@ -71,6 +90,11 @@ func run(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func bindFlagsToConfig(flags *pflag.FlagSet) {
+	viper.BindPFlag("log.filename", flags.Lookup("log"))
+	viper.BindPFlag("log.level", flags.Lookup("log-level"))
+}
+
 func Run() error {
 	cmd := cobra.Command{
 		Use:     program.Name,
@@ -80,7 +104,11 @@ func Run() error {
 	}
 
 	cmd.PersistentFlags().StringVar(&basePath, "basePath", "~/.local/laravel-ls", "base path")
+	cmd.PersistentFlags().String("log", "log", "Log file, relative to basePath")
+	cmd.PersistentFlags().String("log-level", "info", fmt.Sprintf("Logging level, one of: %v", log.AllLevels))
 	cmd.SetVersionTemplate(`{{with .Name}}{{printf "%s " .}}{{end}}{{printf "%s" .Version}}` + "\n")
+
+	bindFlagsToConfig(cmd.PersistentFlags())
 
 	return cmd.Execute()
 }
