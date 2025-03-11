@@ -94,9 +94,15 @@ func run(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func must(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
 func bindFlagsToConfig(flags *pflag.FlagSet) {
-	viper.BindPFlag("log.filename", flags.Lookup("log"))
-	viper.BindPFlag("log.level", flags.Lookup("log-level"))
+	must(viper.BindPFlag("log.filename", flags.Lookup("log")))
+	must(viper.BindPFlag("log.level", flags.Lookup("log-level")))
 }
 
 func Run() error {
