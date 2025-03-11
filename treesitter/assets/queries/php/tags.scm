@@ -100,12 +100,15 @@
 
 
 ; app()->make('key')
+; app()->bound('key')
+; app()->isShared('key')
 (member_call_expression
   object: (
     function_call_expression
     function: (name) @object.name (#eq? @object.name "app")
     arguments: (arguments "(" . ")"))
-  name: (name) @function.name (#eq? @function.name "make" )
+  name: (name) @function.name
+  (#any-of? @function.name "make" "bound" "isShared")
   arguments: (arguments
     . (argument [
         (string (string_content)?) @app.service
