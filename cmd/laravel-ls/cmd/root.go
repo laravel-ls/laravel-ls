@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -50,7 +51,10 @@ func run(cmd *cobra.Command, args []string) error {
 	// Setup config
 	viper.AddConfigPath(".")
 	viper.AddConfigPath(basePath)
-	viper.ReadInConfig()
+	err := viper.ReadInConfig()
+	if err != nil && !errors.As(err, &viper.ConfigFileNotFoundError{}) {
+		return err
+	}
 
 	cfg, err := config.Parse(viper.GetViper())
 	if err != nil {
