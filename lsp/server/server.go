@@ -77,7 +77,7 @@ func (s *Server) HandleTextDocumentCodeAction(params protocol.CodeActionParams) 
 func (s *Server) HandleTextDocumentCompletion(params protocol.CompletionParams) (protocol.CompletionResult, error) {
 	log.WithField("method", protocol.MethodTextDocumentCompletion).
 		WithField("filename", params.TextDocument.URI).
-		Info("completion")
+		Debug("completion")
 
 	response := protocol.CompletionResult{
 		CompletionItems: []protocol.CompletionItem{},
@@ -108,7 +108,7 @@ func (s *Server) HandleTextDocumentCompletion(params protocol.CompletionParams) 
 func (s *Server) HandleTextDocumentHover(params protocol.HoverParams) (protocol.HoverResult, error) {
 	log.WithField("method", protocol.MethodTextDocumentHover).
 		WithField("filename", params.TextDocument.URI).
-		Info("Hover")
+		Debug("Hover")
 
 	response := protocol.HoverResult{}
 
@@ -143,7 +143,7 @@ func (s *Server) HandleTextDocumentHover(params protocol.HoverParams) (protocol.
 func (s *Server) HandleTextDocumentDiagnostic(params protocol.DocumentDiagnosticParams) (protocol.DocumentDiagnosticReport, error) {
 	log.WithField("method", protocol.MethodTextDocumentDiagnostic).
 		WithField("filename", params.TextDocument.URI).
-		Info("Diagnostic")
+		Debug("Diagnostic")
 
 	file, err := s.getFile(params.TextDocument)
 	if file == nil {
@@ -183,7 +183,7 @@ func (s *Server) HandleTextDocumentDiagnostic(params protocol.DocumentDiagnostic
 func (s *Server) HandleTextDocumentDefinition(params protocol.DefinitionParams) (response protocol.DefinitionResponse, err error) {
 	log.WithField("method", protocol.MethodTextDocumentDefinition).
 		WithField("filename", params.TextDocument.URI).
-		Info("Definition")
+		Debug("Definition")
 
 	file, err := s.getFile(params.TextDocument)
 	if err != nil {
@@ -214,7 +214,7 @@ func (s Server) HandleTextDocumentDidOpen(params protocol.DidOpenTextDocumentPar
 	log.WithField("method", protocol.MethodTextDocumentDidOpen).
 		WithField("lang", params.TextDocument.LanguageID).
 		WithField("filename", params.TextDocument.URI).
-		Info("Document opened")
+		Debug("Document opened")
 
 	filename, err := validateURI(params.TextDocument.URI)
 	if err != nil {
@@ -228,7 +228,7 @@ func (s Server) HandleTextDocumentDidOpen(params protocol.DidOpenTextDocumentPar
 func (s Server) HandleTextDocumentDidChange(params protocol.DidChangeTextDocumentParams) error {
 	log.WithField("method", protocol.MethodTextDocumentDidChange).
 		WithField("filename", params.TextDocument.URI).
-		Info("Document changed")
+		Debug("Document changed")
 
 	file, err := s.getFile(params.TextDocument.TextDocumentIdentifier)
 	if err != nil {
@@ -242,7 +242,7 @@ func (s Server) HandleTextDocumentDidChange(params protocol.DidChangeTextDocumen
 		start := toTSPoint(change.Range.Start)
 		end := toTSPoint(change.Range.End)
 
-		log.Info("Change", start, end, change.Text)
+		log.Debug("Change", start, end, change.Text)
 
 		err := file.Update(start, end, []byte(change.Text))
 		if err != nil {
@@ -256,14 +256,14 @@ func (s Server) HandleTextDocumentDidChange(params protocol.DidChangeTextDocumen
 func (s Server) HandleTextDocumentDidSave(params protocol.DidSaveTextDocumentParams) error {
 	log.WithField("method", protocol.MethodTextDocumentDidSave).
 		WithField("filename", params.TextDocument.URI).
-		Info("Document saved")
+		Debug("Document saved")
 	return nil
 }
 
 func (s Server) HandleTextDocumentDidClose(params protocol.DidCloseTextDocumentParams) error {
 	log.WithField("method", protocol.MethodTextDocumentDidClose).
 		WithField("filename", params.TextDocument.URI).
-		Info("Document closed")
+		Debug("Document closed")
 
 	filename, err := validateURI(params.TextDocument.URI)
 	if err != nil {
@@ -281,7 +281,7 @@ func (s *Server) HandleInitialize(params protocol.InitializeParams) (protocol.In
 
 	log.WithField("method", protocol.MethodInitialize).
 		WithField("rootPath", rootPath).
-		Info("Initialized")
+		Debug("Initialize")
 
 	s.providerManager.Init(provider.InitContext{
 		Logger:    log.WithField("module", "Initialize"),
@@ -373,7 +373,7 @@ func (s *Server) dispatch(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc
 		return s.HandleInitialize(params)
 	case protocol.MethodInitialized:
 		log.WithField("method", protocol.MethodInitialized).
-			Info("Initialized")
+			Debug("Initialized")
 		return nil, nil
 	default:
 		// Respond with a method not found error

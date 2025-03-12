@@ -48,11 +48,11 @@ func (p *Provider) ResolveDefinition(ctx provider.DefinitionContext) {
 
 		viewFile := laravel.ViewFromName(name)
 
-		ctx.Logger.Info(viewFile)
+		ctx.Logger.Debug(viewFile)
 
 		fullPath, found := p.fs.find(p.rootPath, viewFile.Filename())
 
-		ctx.Logger.Infof("%s %v", fullPath, found)
+		ctx.Logger.Debugf("%s %v", fullPath, found)
 
 		if found {
 			ctx.Publish(protocol.Location{
