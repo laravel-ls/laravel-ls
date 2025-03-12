@@ -46,5 +46,5 @@ func FindPHPProcess(rootPath string) (*PHPProccess, error) {
 		}
 	}
 
-	return nil, errors.New("failed to find php binary")
+	return nil, ErrNoBinary
 }
