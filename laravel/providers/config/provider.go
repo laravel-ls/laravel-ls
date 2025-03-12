@@ -29,14 +29,12 @@ func (p *Provider) Register(manager *provider.Manager) {
 }
 
 func (p *Provider) Hover(ctx provider.HoverContext) {
-	ctx.Logger.Info("app")
 	node := queries.ConfigCalls(ctx.File).At(ctx.Position)
 	if node == nil {
 		return
 	}
 
 	service := php.GetStringContent(node, ctx.File.Src)
-	ctx.Logger.Info(service)
 
 	repo, err := ctx.Project.Configs()
 	if err != nil {
