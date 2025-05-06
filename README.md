@@ -125,6 +125,20 @@ asset('main.css');
 
 ## Install
 
+###  Download via github
+
+Official binaries for linux are provided on each [github release](https://github.com/laravel-ls/laravel-ls/releases)
+
+Just download the program and make sure its located somewhere in your `$PATH`
+
+Example command to download:
+```sh
+sudo wget -O /usr/local/bin/laravel-ls https://github.com/laravel-ls/laravel-ls/releases/download/<VERSION>/laravel-ls-<VERSION>-linux-amd64 & \
+   sudo chmod 755 /usr/local/bin/laravel-ls
+```
+
+### Download via go
+
 The program can be installed via go:
 
 ```sh
