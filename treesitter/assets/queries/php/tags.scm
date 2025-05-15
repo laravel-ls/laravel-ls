@@ -166,6 +166,22 @@
     ])
   ))
 
+; response()->view() calls
+(member_call_expression
+  object: (
+    function_call_expression
+    function: (name) @object.name (#eq? @object.name "response")
+    arguments: (arguments "(" . ")"))
+  name: (name) @function.name
+  (#eq? @function.name "view")
+  arguments: (arguments
+    . (argument [
+        (string (string_content)?) @view.name
+        (encapsed_string . (string_content) .) @view.name
+        (encapsed_string "\"" . "\"") @view.name
+    ])
+  ))
+
 ; --------------------------------------------------
 ;  Environment
 ; --------------------------------------------------
