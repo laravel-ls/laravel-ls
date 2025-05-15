@@ -48,7 +48,7 @@ func validateURI(uri string) (string, error) {
 }
 
 func (s *Server) HandleTextDocumentCodeAction(params protocol.CodeActionParams) (protocol.CodeActionResult, error) {
-	log.WithField("method", protocol.MethodTextDocumentCompletion).
+	log.WithField("method", protocol.MethodTextDocumentCodeAction).
 		WithField("filename", params.TextDocument.URI).
 		Info("code action")
 
