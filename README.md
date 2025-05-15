@@ -48,6 +48,21 @@ Route::view('/user/profile', 'user.profile')
 - [x] Diagnostics for template files that do not exists
 - [ ] Code action to create view file that do not exists.
 
+### Routes
+
+```php
+route('dashboard');
+redirect()->route('dashboard');
+URL::route('dashboard');
+```
+
+- [ ] Hover information shows route definition
+- [ ] Go to definition
+- [ ] Auto-complete existing route names
+- [ ] Auto-complete route arguments
+- [ ] Diagnostics for routes that do not exists
+- [ ] Code action to create a new route if route do not exists.
+
 ### Environment
 
 ```php
