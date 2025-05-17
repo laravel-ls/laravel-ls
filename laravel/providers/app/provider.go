@@ -61,11 +61,12 @@ func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
 		return
 	}
 
+	kind := protocol.CompletionItemKindClass
 	for key, meta := range repo.Find(text) {
 		ctx.Publish(protocol.CompletionItem{
 			Label:  key,
 			Detail: meta.Class,
-			Kind:   protocol.CompletionItemKindClass,
+			Kind:   &kind,
 		})
 	}
 }
@@ -86,10 +87,10 @@ func (p *Provider) ResolveDefinition(ctx provider.DefinitionContext) {
 	key := php.GetStringContent(node, ctx.File.Src)
 	if meta, found := repo.Get(key); found {
 		ctx.Publish(protocol.Location{
-			URI: meta.Path,
+			URI: protocol.DocumentURI(meta.Path),
 			Range: protocol.Range{
 				Start: protocol.Position{
-					Line: meta.Line - 1,
+					Line: uint32(meta.Line - 1),
 				},
 			},
 		})
@@ -117,7 +118,7 @@ func (p *Provider) Diagnostic(ctx provider.DiagnosticContext) {
 		if !repo.Exists(key) {
 			ctx.Publish(provider.Diagnostic{
 				Range:    capture.Node.Range(),
-				Severity: protocol.SeverityError,
+				Severity: protocol.DiagnosticSeverityError,
 				Message:  fmt.Sprintf("application binding '%s' does not exist", key),
 			})
 		}

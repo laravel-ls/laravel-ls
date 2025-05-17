@@ -2,13 +2,15 @@ package protocol
 
 import "encoding/json"
 
-// ProgressToken is the progress token provided by the client or server.
+// A token that can be used to report work done progress.
+// Can be a string or a number.
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#progress
 type ProgressToken struct {
 	name   string
 	number int32
 }
 
-// MarshalJSON implements json.Marshaler.
 func (v *ProgressToken) MarshalJSON() ([]byte, error) {
 	if v.name != "" {
 		return json.Marshal(v.name)
@@ -17,7 +19,6 @@ func (v *ProgressToken) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.number)
 }
 
-// UnmarshalJSON implements json.Unmarshaler.
 func (v *ProgressToken) UnmarshalJSON(data []byte) error {
 	*v = ProgressToken{}
 	if err := json.Unmarshal(data, &v.number); err == nil {

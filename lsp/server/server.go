@@ -47,12 +47,12 @@ func validateURI(uri string) (string, error) {
 	return path, err
 }
 
-func (s *Server) HandleTextDocumentCodeAction(params protocol.CodeActionParams) (protocol.CodeActionResult, error) {
+func (s *Server) HandleTextDocumentCodeAction(params protocol.CodeActionParams) ([]protocol.CodeAction, error) {
 	log.WithField("method", protocol.MethodTextDocumentCodeAction).
 		WithField("filename", params.TextDocument.URI).
 		Info("code action")
 
-	response := protocol.CodeActionResult{}
+	response := []protocol.CodeAction{}
 
 	file, err := s.getFile(params.TextDocument)
 	if err != nil {
@@ -67,20 +67,20 @@ func (s *Server) HandleTextDocumentCodeAction(params protocol.CodeActionParams) 
 		},
 		Range: toTSRange(params.Range),
 		Publish: func(codeAction protocol.CodeAction) {
-			response.CodeActions = append(response.CodeActions, codeAction)
+			response = append(response, codeAction)
 		},
 	})
 
 	return response, nil
 }
 
-func (s *Server) HandleTextDocumentCompletion(params protocol.CompletionParams) (protocol.CompletionResult, error) {
+func (s *Server) HandleTextDocumentCompletion(params protocol.CompletionParams) (protocol.CompletionResponse, error) {
 	log.WithField("method", protocol.MethodTextDocumentCompletion).
 		WithField("filename", params.TextDocument.URI).
 		Debug("completion")
 
-	response := protocol.CompletionResult{
-		CompletionItems: []protocol.CompletionItem{},
+	response := protocol.CompletionResponse{
+		Items: []protocol.CompletionItem{},
 	}
 
 	file, err := s.getFile(params.TextDocument)
@@ -96,7 +96,7 @@ func (s *Server) HandleTextDocumentCompletion(params protocol.CompletionParams) 
 		},
 		Position: toTSPoint(params.Position),
 		Publish: func(item protocol.CompletionItem) {
-			response.CompletionItems = append(response.CompletionItems, item)
+			response.Items = append(response.Items, item)
 		},
 	}
 
@@ -132,9 +132,12 @@ func (s *Server) HandleTextDocumentHover(params protocol.HoverParams) (protocol.
 	})
 
 	if len(content) > 0 {
-		response.Contents.MarkupContent = &protocol.MarkupContent{
+		contents := protocol.MarkupContent{
 			Kind:  "markup",
 			Value: content,
+		}
+		response.Hover.Contents = protocol.MarkupContentOrMarkedString{
+			Markup: &contents,
 		}
 	}
 	return response, nil
@@ -147,7 +150,7 @@ func (s *Server) HandleTextDocumentDiagnostic(params protocol.DocumentDiagnostic
 
 	file, err := s.getFile(params.TextDocument)
 	if file == nil {
-		return &protocol.FullDocumentDiagnosticReport{}, err
+		return protocol.DocumentDiagnosticReport{}, err
 	}
 
 	items := []protocol.Diagnostic{}
@@ -167,16 +170,18 @@ func (s *Server) HandleTextDocumentDiagnostic(params protocol.DocumentDiagnostic
 					Start: FromTSPoint(start),
 					End:   FromTSPoint(end),
 				},
-				Severity: protocol.DiagnosticSeverity(diagnostic.Severity),
+				Severity: &diagnostic.Severity,
 				Source:   program.Name,
 				Message:  diagnostic.Message,
 			})
 		},
 	})
 
-	return &protocol.FullDocumentDiagnosticReport{
-		Kind:  "full",
-		Items: items,
+	return protocol.DocumentDiagnosticReport{
+		Full: &protocol.FullDocumentDiagnosticReport{
+			Kind:  "full",
+			Items: items,
+		},
 	}, nil
 }
 
@@ -201,7 +206,7 @@ func (s *Server) HandleTextDocumentDefinition(params protocol.DefinitionParams) 
 		Position: toTSPoint(params.Position),
 		Publish: func(location protocol.Location) {
 			location.URI = "file://" + location.URI
-			response.Locations = append(response.Locations, location)
+			response.LocationList = append(response.LocationList, location)
 		},
 	}
 
@@ -274,7 +279,7 @@ func (s Server) HandleTextDocumentDidClose(params protocol.DidCloseTextDocumentP
 }
 
 func (s *Server) HandleInitialize(params protocol.InitializeParams) (protocol.InitializeResult, error) {
-	rootPath, found := strings.CutPrefix(params.RootURI, "file://")
+	rootPath, found := strings.CutPrefix(string(params.RootURI), "file://")
 	if !found {
 		return protocol.InitializeResult{}, fmt.Errorf("server only support local filesystem root paths")
 	}

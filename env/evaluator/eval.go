@@ -77,8 +77,8 @@ func (s *State) assignment(node *ts.Node) error {
 	keyName := key.Utf8Text(s.file.Src)
 	s.variables[keyName] = env.Variable{
 		Value:  stringValue,
-		Line:   int(value.StartPosition().Row),
-		Column: int(value.StartPosition().Column),
+		Line:   uint32(value.StartPosition().Row),
+		Column: uint32(value.StartPosition().Column),
 	}
 	return nil
 }

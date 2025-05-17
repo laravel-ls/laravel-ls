@@ -6,47 +6,77 @@ const (
 	MethodInitialized = "initialized"
 )
 
-// InitializeParams represents the parameters sent during the "initialize" request.
+// The initialize parameters.
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#initializeParams
 type InitializeParams struct {
 	WorkDoneProgressParams
 
-	// ProcessID is the ID of the parent process that started the server. If null, the process is not specified.
-	ProcessID int `json:"processId,omitempty"`
+	// The process Id of the parent process that started the server.
+	// Is null if the process has not been started by another process.
+	ProcessID *int `json:"processId,omitempty"`
 
-	// ClientInfo is the information about the client.
+	// The information about the client.
+	//
+	// @since 3.15.0
 	ClientInfo *ClientInfo `json:"clientInfo,omitempty"`
 
-	// RootURI is the root URI of the workspace, which may be null.
-	RootURI string `json:"rootUri,omitempty"`
+	// The locale the client is currently showing the user interface in.
+	// This must not be used to influence the content of hover, completion, signature help etc.
+	//
+	// @since 3.16.0
+	Locale *string `json:"locale,omitempty"`
 
-	// Capabilities represents the client capabilities.
+	// The rootPath of the workspace. Is null if no folder is open.
+	//
+	// @deprecated in favour of rootUri.
+	RootPath string `json:"rootPath,omitempty"`
+
+	// The rootUri of the workspace. Is null if no folder is open.
+	// If both `rootPath` and `rootUri` are set `rootUri` wins.
+	RootURI DocumentURI `json:"rootUri,omitempty"`
+
+	// User provided initialization options.
+	InitializationOptions LSPAny `json:"initializationOptions,omitempty"`
+
+	// The capabilities provided by the client (editor or tool)
 	Capabilities ClientCapabilities `json:"capabilities"`
 
-	// Trace enables tracing and can be set to "off", "messages", or "verbose".
-	Trace TraceValue `json:"trace,omitempty"`
+	// The initial trace setting. If omitted trace is disabled ('off').
+	Trace *TraceValue `json:"trace,omitempty"`
+
+	// The workspace folders configured in the client when the server starts.
+	// This property is only available if the client supports workspace folders.
+	//
+	// @since 3.6.0
+	WorkspaceFolders []WorkspaceFolder `json:"workspaceFolders,omitempty"`
 }
 
-// InitializeResult represents the response sent by the server after receiving
-// an InitializeRequest. It contains the capabilities of the language server.
+// The result returned from an initialize request.
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#initializeResult
 type InitializeResult struct {
-	// Capabilities defines the capabilities provided by the language server.
+	// The capabilities the language server provides.
 	Capabilities ServerCapabilities `json:"capabilities"`
 
-	// ServerInfo provides information about the server (optional).
+	// Information about the server.
+	//
+	// @since 3.15.0
 	ServerInfo *ServerInfo `json:"serverInfo,omitempty"`
 }
 
-// TraceValue represents a InitializeParams Trace mode.
+// The LSP allows the client to control the tracing of the server.
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#traceValue
 type TraceValue string
 
-// list of TraceValue.
 const (
-	// TraceOff disable tracing.
-	TraceOff TraceValue = "off"
+	// No tracing.
+	TraceValueOff TraceValue = "off"
 
-	// TraceMessage normal tracing mode.
-	TraceMessage TraceValue = "message"
+	// Messages only.
+	TraceValueMessages TraceValue = "messages"
 
-	// TraceVerbose verbose tracing mode.
-	TraceVerbose TraceValue = "verbose"
+	// Verbose message logging.
+	TraceValueVerbose TraceValue = "verbose"
 )

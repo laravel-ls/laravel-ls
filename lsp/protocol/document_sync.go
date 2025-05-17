@@ -10,51 +10,80 @@ const (
 	MethodTextDocumentDidSave = "textDocument/didSave"
 )
 
-// DidOpenTextDocumentParams represents the parameters sent in the notification when a document is opened by the client.
+// The parameters sent in a didOpen notification.
+//
+// @since 3.0.0
+
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#didOpenTextDocumentParams
 type DidOpenTextDocumentParams struct {
-	// TextDocument contains the details of the document that was opened.
+	// The document that was opened.
 	TextDocument TextDocumentItem `json:"textDocument"`
 }
 
-// DidCloseTextDocumentParams represents the parameters sent in the notification
-// when a document is closed by the client.
+// The parameters sent in a didClose notification.
+//
+// @since 3.0.0
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#didCloseTextDocumentParams
 type DidCloseTextDocumentParams struct {
-	// TextDocument contains the details of the document that was closed.
+	// The document that was closed.
 	TextDocument TextDocumentIdentifier `json:"textDocument"`
 }
 
-// DidChangeTextDocumentParams represents the parameters sent in the notification
-// when a document is changed by the client.
+// The parameters sent in a didChange notification.
+//
+// @since 3.0.0
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#didChangeTextDocumentParams
 type DidChangeTextDocumentParams struct {
-	// TextDocument holds the identifier and version of the text document that changed.
+	// The document that did change. The version number points
+	// to the version after all provided content changes have been applied.
 	TextDocument VersionedTextDocumentIdentifier `json:"textDocument"`
 
-	// ContentChanges is a list of changes applied to the document.
-	// The changes represent the modified content of the document.
+	// The actual content changes. The content changes describe single state
+	// changes to the document. So if there are two content changes c1 (at
+	// array index 0) and c2 (at array index 1) for a document in state S then
+	// c1 moves the document from S to S' and c2 from S' to S''. So c1 is
+	// computed on the state S and c2 is computed on the state S'.
+	//
+	// To mirror the content of a document using change events use the following
+	// approach:
+	// - start with the same initial content
+	// - apply the 'textDocument/didChange' notifications in the order you
+	//   receive them.
+	// - apply the `TextDocumentContentChangeEvent`s in a single notification
+	//   in the order you receive them.
 	ContentChanges []TextDocumentContentChangeEvent `json:"contentChanges"`
 }
 
-// DidSaveTextDocumentParams represents the parameters sent in the notification
-// when a document is saved by the client.
+// The parameters sent in a didSave notification.
+//
+// @since 3.0.0
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#didSaveTextDocumentParams
 type DidSaveTextDocumentParams struct {
-	// TextDocument holds the identifier and version of the text document that was saved
+	// The document that was saved.
 	TextDocument TextDocumentIdentifier `json:"textDocument"`
 
-	// Text is the new text of the document that was saved.
-	Text *string `json:"text,omitempty"`
+	// Optional the content when saved. Depends on the includeText value
+	// when the save notification was requested.
+	Text string `json:"text,omitempty"`
 }
 
-// TextDocumentContentChangeEvent represents a change to a text document.
-// It includes the text that was inserted, deleted, or modified.
+// An event describing a change to a text document.
+// If range and rangeLength are omitted, the new text is considered the full content.
+//
+// @since 3.0.0
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocumentContentChangeEvent
 type TextDocumentContentChangeEvent struct {
-	// Range specifies the range of the text document that changed.
-	// If nil, the entire document is considered changed.
+	// The range of the document that changed.
 	Range *Range `json:"range,omitempty"`
 
-	// RangeLength is the length of the range that got replaced.
-	// This field is optional and only provided when applicable.
-	RangeLength *int `json:"rangeLength,omitempty"`
+	// The optional length of the range that got replaced.
+	// Deprecated: use range instead.
+	RangeLength *uint `json:"rangeLength,omitempty"`
 
-	// Text is the new text of the document after the change.
+	// The new text of the document.
 	Text string `json:"text"`
 }

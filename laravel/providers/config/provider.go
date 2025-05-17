@@ -62,11 +62,12 @@ func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
 		return
 	}
 
+	kind := protocol.CompletionItemKindFile
 	for key, meta := range repo.Find(text) {
 		ctx.Publish(protocol.CompletionItem{
 			Label:  key,
 			Detail: meta.File,
-			Kind:   protocol.CompletionItemKindFile,
+			Kind:   &kind,
 		})
 	}
 }
@@ -87,10 +88,10 @@ func (p *Provider) ResolveDefinition(ctx provider.DefinitionContext) {
 	key := php.GetStringContent(node, ctx.File.Src)
 	if meta, found := repo.Get(key); found {
 		ctx.Publish(protocol.Location{
-			URI: path.Join(p.rootPath, meta.File),
+			URI: protocol.DocumentURI(path.Join(p.rootPath, meta.File)),
 			Range: protocol.Range{
 				Start: protocol.Position{
-					Line: meta.Line - 1,
+					Line: uint32(meta.Line - 1),
 				},
 			},
 		})
@@ -118,7 +119,7 @@ func (p *Provider) Diagnostic(ctx provider.DiagnosticContext) {
 		if !repo.Exists(key) {
 			ctx.Publish(provider.Diagnostic{
 				Range:    capture.Node.Range(),
-				Severity: protocol.SeverityError,
+				Severity: protocol.DiagnosticSeverityError,
 				Message:  fmt.Sprintf("Config key '%s' does not exist", key),
 			})
 		}

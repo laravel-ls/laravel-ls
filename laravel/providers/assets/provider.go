@@ -46,10 +46,11 @@ func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
 	if node != nil {
 		filename := php.GetStringContent(node, ctx.File.Src)
 
+		kind := protocol.CompletionItemKindFile
 		for _, file := range p.repo.Search(p.rootPath, filename) {
 			ctx.Publish(protocol.CompletionItem{
 				Label: file,
-				Kind:  protocol.CompletionItemKindFile,
+				Kind:  &kind,
 			})
 		}
 	}
@@ -61,7 +62,7 @@ func (p *Provider) ResolveDefinition(ctx provider.DefinitionContext) {
 		filename := php.GetStringContent(node, ctx.File.Src)
 		if p.repo.Exists(p.rootPath, filename) {
 			ctx.Publish(protocol.Location{
-				URI: path.Join(p.rootPath, "public", filename),
+				URI: protocol.DocumentURI(path.Join(p.rootPath, "public", filename)),
 			})
 		}
 	}
@@ -73,7 +74,7 @@ func (p *Provider) Diagnostic(ctx provider.DiagnosticContext) {
 		if !p.repo.Exists(p.rootPath, filename) {
 			ctx.Publish(provider.Diagnostic{
 				Range:    capture.Node.Range(),
-				Severity: protocol.SeverityError,
+				Severity: protocol.DiagnosticSeverityError,
 				Message:  "Asset not found",
 			})
 		}

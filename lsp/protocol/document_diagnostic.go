@@ -1,59 +1,92 @@
 package protocol
 
+import (
+	"encoding/json"
+	"fmt"
+)
+
 const (
 	MethodTextDocumentDiagnostic = "textDocument/diagnostic"
 )
 
-// DocumentDiagnosticParams represents the parameters for the `textDocument/diagnostic` request.
-// It is used to request diagnostics for a specific document.
+// Parameters of the document diagnostic request.
+//
+// @since 3.17.0
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#documentDiagnosticParams
 type DocumentDiagnosticParams struct {
-	// WorkDoneProgressParams contains options for work done progress reporting.
 	WorkDoneProgressParams
+	PartialResultParams
 
-	// TextDocument identifies the specific document to retrieve diagnostics for.
+	// The text document to request diagnostics for.
 	TextDocument TextDocumentIdentifier `json:"textDocument"`
 
-	// Identifier uniquely identifies the request.
-	Identifier string `json:"identifier,omitempty"`
+	// The additional identifier provided during registration.
+	Identifier *string `json:"identifier,omitempty"`
 
-	// PreviousResultID is the identifier of the last known result for this document.
-	// The server may use this to optimize diagnostic calculations and only return differences.
-	PreviousResultID string `json:"previousResultId,omitempty"`
+	// The current version of the document.
+	// If provided, servers can avoid computing diagnostics again if the document version hasn’t changed.
+	PreviousResultID *string `json:"previousResultId,omitempty"`
 }
 
-// DocumentDiagnosticReport is an interface for diagnostic reports,
-// which can be either FullDocumentDiagnosticReport or RelatedDocumentDiagnosticReport.
-type DocumentDiagnosticReport interface {
-	GetKind() string
+// DocumentDiagnosticReport is either a full or an unchanged diagnostic report.
+//
+// @since 3.17.0
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#documentDiagnosticReport
+type DocumentDiagnosticReport struct {
+	Full      *FullDocumentDiagnosticReport
+	Unchanged *UnchangedDocumentDiagnosticReport
 }
 
-// FullDocumentDiagnosticReport represents a full set of diagnostics for a document.
+// A full diagnostic report with a full set of problems.
+//
+// @since 3.17.0
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#fullDocumentDiagnosticReport
 type FullDocumentDiagnosticReport struct {
-	// Kind indicates this is a full document diagnostic report.
-	Kind string `json:"kind"` // Should be "full"
-
-	// ResultID is an optional identifier for caching and incremental updates.
-	ResultID string `json:"resultId,omitempty"`
-
-	// Items contains the list of diagnostics for the document.
-	Items []Diagnostic `json:"items"`
+	Kind     string       `json:"kind"` // Should always be "full"
+	ResultID string       `json:"resultId,omitempty"`
+	Items    []Diagnostic `json:"items"`
 }
 
-// RelatedDocumentDiagnosticReport represents diagnostics for a document with references to related documents.
-type RelatedDocumentDiagnosticReport struct {
-	// Kind indicates this is a related document diagnostic report.
-	Kind string `json:"kind"` // Should be "related"
-
-	// RelatedDocuments maps document URIs to associated DocumentDiagnosticReport objects.
-	RelatedDocuments map[string]DocumentDiagnosticReport `json:"relatedDocuments"`
+// An unchanged diagnostic report indicating nothing has changed.
+//
+// @since 3.17.0
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#unchangedDocumentDiagnosticReport
+type UnchangedDocumentDiagnosticReport struct {
+	Kind     string `json:"kind"` // Should always be "unchanged"
+	ResultID string `json:"resultId"`
 }
 
-// GetKind returns the kind of FullDocumentDiagnosticReport.
-func (f *FullDocumentDiagnosticReport) GetKind() string {
-	return f.Kind
-}
+func (r *DocumentDiagnosticReport) UnmarshalJSON(data []byte) error {
+	// reset object first.
+	*r = DocumentDiagnosticReport{}
 
-// GetKind returns the kind of RelatedDocumentDiagnosticReport.
-func (r *RelatedDocumentDiagnosticReport) GetKind() string {
-	return r.Kind
+	var temp struct {
+		Kind string `json:"kind"`
+	}
+
+	if err := json.Unmarshal(data, &temp); err != nil {
+		return err
+	}
+
+	switch temp.Kind {
+	case "full":
+		var full FullDocumentDiagnosticReport
+		if err := json.Unmarshal(data, &full); err != nil {
+			return err
+		}
+		r.Full = &full
+	case "unchanged":
+		var unchanged UnchangedDocumentDiagnosticReport
+		if err := json.Unmarshal(data, &unchanged); err != nil {
+			return err
+		}
+		r.Unchanged = &unchanged
+	default:
+		return fmt.Errorf("unknown document diagnostic report kind: %s", temp.Kind)
+	}
+
+	return nil
 }

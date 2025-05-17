@@ -4,17 +4,18 @@ import (
 	"github.com/laravel-ls/laravel-ls/lsp/protocol"
 )
 
-func codeAction(uri, title string, line int, text string) protocol.CodeAction {
+func codeAction(uri protocol.DocumentURI, title string, line int, text string) protocol.CodeAction {
+	kind := protocol.CodeActionQuickFix
 	return protocol.CodeAction{
 		Title: title,
-		Kind:  protocol.CodeActionQuickFix,
+		Kind:  &kind,
 		Edit: &protocol.WorkspaceEdit{
-			Changes: map[string][]protocol.TextEdit{
+			Changes: map[protocol.DocumentURI][]protocol.TextEdit{
 				uri: {
 					{
 						Range: protocol.Range{
-							Start: protocol.Position{Line: line, Character: 0},
-							End:   protocol.Position{Line: line, Character: len(text)},
+							Start: protocol.Position{Line: uint32(line), Character: 0},
+							End:   protocol.Position{Line: uint32(line), Character: uint32(len(text))},
 						},
 						NewText: text,
 					},

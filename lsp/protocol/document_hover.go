@@ -2,69 +2,114 @@ package protocol
 
 import (
 	"encoding/json"
+	"errors"
 )
 
 const (
 	MethodTextDocumentHover = "textDocument/hover"
 )
 
-// HoverParams represents the parameters for a `textDocument/hover` request.
-// It provides the position in the text document where hover information is requested.
+// Parameters for a textDocument/hover request.
+//
+// @since 3.0.0
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#hoverParams
 type HoverParams struct {
-	// TextDocument is the identifier for the text document.
-	TextDocument TextDocumentIdentifier `json:"textDocument"`
-
-	// Position specifies the position inside the text document where hover information is requested.
-	Position Position `json:"position"`
-
-	// WorkDoneProgressParams allows reporting progress for this request.
+	TextDocumentPositionParams
 	WorkDoneProgressParams
 }
 
-// HoverResult represents the result of a `textDocument/hover` request.
-// It contains the hover content and an optional range within the document.
-type HoverResult struct {
-	// Contents is the hover information provided by the server.
-	// It can be a string, a MarkupContent object, or an array of MarkedString objects.
-	Contents HoverContent `json:"contents"`
+// The result of a hover request.
+//
+// @since 3.0.0
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#hover
+type Hover struct {
+	// The hover's content.
+	Contents MarkupContentOrMarkedString `json:"contents"`
 
-	// Range is an optional range in the document that this hover refers to.
+	// An optional range inside the text document that is used to
+	// visualize the hover, e.g. by changing the background color.
 	Range *Range `json:"range,omitempty"`
 }
 
-// MarkedString represents either a raw string or a language-specific string with a language identifier.
+// The result of a textDocument/hover request.
+//
+// Can be a Hover object or null.
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#hover
+type HoverResult struct {
+	Hover *Hover
+	Null  bool
+}
+
+func (h *HoverResult) UnmarshalJSON(data []byte) error {
+	*h = HoverResult{}
+
+	if string(data) == "null" {
+		h.Null = true
+		return nil
+	}
+	var hover Hover
+	if err := json.Unmarshal(data, &hover); err == nil {
+		return err
+	}
+	h.Hover = &hover
+	return nil
+}
+
+func (h HoverResult) MarshalJSON() ([]byte, error) {
+	if h.Null {
+		return []byte("null"), nil
+	}
+	return json.Marshal(h.Hover)
+}
+
+// MarkedString can be used to render human-readable text,
+// optionally with a language hint.
+//
+// @since 3.0.0
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#markedString
 type MarkedString struct {
 	Language string `json:"language,omitempty"`
 	Value    string `json:"value"`
 }
 
-// MarkupContent represents content with a specific markup kind (e.g., Markdown or plain text).
+// MarkupContent represents a string value with optional markup kind.
+//
+// @since 3.0.0
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#markupcontent
 type MarkupContent struct {
-	// Kind specifies the type of markup (e.g., "plaintext" or "markdown").
-	Kind string `json:"kind"`
-
-	// Value is the content to be displayed in the hover.
-	Value string `json:"value"`
+	Kind  string `json:"kind"`  // "plaintext" or "markdown"
+	Value string `json:"value"` // actual content
 }
 
-// HoverContent represents the content for the hover response.
-// It can be one of MarkupContent, MarkedString, or an array of MarkedString.
-type HoverContent struct {
-	MarkupContent   *MarkupContent `json:"-"`
-	MarkedStrings   []MarkedString `json:"-"`
-	PlainTextString *string        `json:"-"`
+type MarkupContentOrMarkedString struct {
+	Markup        *MarkupContent
+	MarkedString  *MarkedString
+	MarkedStrings []MarkedString
 }
 
-// MarshalJSON customizes JSON encoding for HoverContent.
-func (h HoverContent) MarshalJSON() ([]byte, error) {
-	if h.MarkupContent != nil {
-		return json.Marshal(h.MarkupContent)
+func (m *MarkupContentOrMarkedString) UnmarshalJSON(data []byte) error {
+	var markup MarkupContent
+	if err := json.Unmarshal(data, &markup); err == nil && markup.Kind != "" {
+		m.Markup = &markup
+		return nil
 	}
-	if h.MarkedStrings != nil {
-		return json.Marshal(h.MarkedStrings)
+
+	var single MarkedString
+	if err := json.Unmarshal(data, &single); err == nil && (single.Language != "" || single.Value != "") {
+		m.MarkedString = &single
+		return nil
 	}
-	if h.PlainTextString != nil {
-		return json.Marshal(h.PlainTextString)
+
+	var many []MarkedString
+	if err := json.Unmarshal(data, &many); err == nil {
+		m.MarkedStrings = many
+		return nil
 	}
-	return nil, nil
+
+	return errors.New("invalid contents: not MarkupContent, MarkedString, or []MarkedString")
 }

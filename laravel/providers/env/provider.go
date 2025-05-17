@@ -77,7 +77,7 @@ func (p *Provider) ResolveCodeAction(ctx provider.CodeActionContext) {
 		}
 
 		if _, found := p.repo.Get(key); !found {
-			uri := "file://" + path.Join(p.rootPath, ".env")
+			uri := protocol.DocumentURI("file://" + path.Join(p.rootPath, ".env"))
 			envFile := ctx.FileCache.Get(path.Join(p.rootPath, ".env"))
 			line := int(envFile.Tree.Root().EndPosition().Row)
 
@@ -129,7 +129,7 @@ func (p *Provider) ResolveDefinition(ctx provider.DefinitionContext) {
 		key := php.GetStringContent(node, ctx.File.Src)
 		if meta, found := p.repo.Get(key); found {
 			ctx.Publish(protocol.Location{
-				URI: path.Join(p.rootPath, ".env"),
+				URI: protocol.DocumentURI(path.Join(p.rootPath, ".env")),
 				Range: protocol.Range{
 					Start: protocol.Position{
 						Line:      meta.Line,
@@ -151,11 +151,12 @@ func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
 
 		text := php.GetStringContent(node, ctx.File.Src)
 
+		kind := protocol.CompletionItemKindConstant
 		for key, meta := range p.repo.Find(text) {
 			ctx.Publish(protocol.CompletionItem{
 				Label:  key,
 				Detail: meta.Value,
-				Kind:   protocol.CompletionItemKindConstant,
+				Kind:   &kind,
 			})
 		}
 	}
@@ -178,7 +179,7 @@ func (p *Provider) Diagnostic(ctx provider.DiagnosticContext) {
 			if !p.repo.Exists(key) && !queries.HasDefault(&capture.Node) {
 				ctx.Publish(provider.Diagnostic{
 					Range:    capture.Node.Range(),
-					Severity: protocol.SeverityError,
+					Severity: protocol.DiagnosticSeverityError,
 					Message:  "Environment variable is not defined",
 				})
 			}

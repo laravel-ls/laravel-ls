@@ -1,24 +1,31 @@
 package protocol
 
-// ClientInfo represents additional information about the client.
+// Information about the client.
+// The client provides this information during the initialize request.
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#initializeParams
+//
+// @since 3.15.0
 type ClientInfo struct {
-	// Name is the name of the client.
+	// The name of the client as defined by the client.
+	// For example "vscode", "emacs" or "vim".
 	Name string `json:"name"`
 
-	// Version is the version of the client (optional).
-	Version string `json:"version,omitempty"`
+	// The client's version as defined by the client.
+	Version *string `json:"version,omitempty"`
 }
 
-// Command represents a command that can be executed in the client.
-// Commands are provided as part of code actions, completion items, and other features.
+// Represents a reference to a command. Provides a title which will be used to represent a command in the UI
+// and optionally a command identifier and arguments.
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#command
 type Command struct {
-	// Title is a human-readable title for the command, displayed in the UI.
+	// Title of the command, like `save`.
 	Title string `json:"title"`
 
-	// Command is the identifier of the actual command to execute.
+	// The identifier of the actual command handler.
 	Command string `json:"command"`
 
-	// Arguments are additional arguments that the command accepts.
-	// These are specific to the command being executed.
-	Arguments []interface{} `json:"arguments,omitempty"`
+	// Arguments that the command handler should be invoked with.
+	Arguments []LSPAny `json:"arguments,omitempty"`
 }

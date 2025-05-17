@@ -40,12 +40,15 @@ type TextDocumentPositionParams struct {
 	Position Position `json:"position"`
 }
 
-// TextEdit represents a textual edit applicable to a document.
+// A text edit applicable to a text document.
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textEdit
 type TextEdit struct {
-	// Range specifies the range of text to be replaced.
+	// The range of the text document to be manipulated. To insert text into a document create a range
+	// where start == end.
 	Range Range `json:"range"`
 
-	// NewText is the string to replace the range with.
+	// The string to be inserted. For delete operations use an empty string.
 	NewText string `json:"newText"`
 }
 

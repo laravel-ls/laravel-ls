@@ -56,7 +56,7 @@ func (p *Provider) ResolveDefinition(ctx provider.DefinitionContext) {
 
 		if found {
 			ctx.Publish(protocol.Location{
-				URI: path.Join(p.rootPath, fullPath),
+				URI: protocol.DocumentURI(path.Join(p.rootPath, fullPath)),
 			})
 		}
 	}
@@ -74,11 +74,12 @@ func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
 			return
 		}
 
+		kind := protocol.CompletionItemKindFile
 		for _, result := range results {
 			ctx.Publish(protocol.CompletionItem{
 				Label:  result.Name(),
 				Detail: result.Path(),
-				Kind:   protocol.CompletionItemKindFile,
+				Kind:   &kind,
 			})
 		}
 	}
@@ -93,7 +94,7 @@ func (p *Provider) Diagnostic(ctx provider.DiagnosticContext) {
 		if !p.fs.exists(p.rootPath, name) {
 			ctx.Publish(provider.Diagnostic{
 				Range:    capture.Node.Range(),
-				Severity: protocol.SeverityError,
+				Severity: protocol.DiagnosticSeverityError,
 				Message:  "View not found",
 			})
 		}

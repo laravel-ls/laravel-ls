@@ -10,80 +10,97 @@ const (
 	MethodTextDocumentCompletion = "textDocument/completion"
 )
 
-// CompletionTriggerKind specifies how the completion request was triggered.
+// How a completion was triggered.
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#completionTriggerKind
 type CompletionTriggerKind int
 
 const (
-	// Invoked means completion was manually triggered, such as by pressing Ctrl+Space.
-	CompletionTriggerInvoked CompletionTriggerKind = 1
+	// Completion was triggered by typing an identifier (24x7 code complete), manual invocation (e.g Ctrl+Space) or via API.
+	CompletionTriggerKindInvoked CompletionTriggerKind = 1
 
-	// TriggerCharacter means completion was triggered by a specific character.
-	CompletionTriggerCharacter CompletionTriggerKind = 2
+	// Completion was triggered by a trigger character specified by the `triggerCharacters` properties of the `CompletionOptions`.
+	CompletionTriggerKindTriggerCharacter CompletionTriggerKind = 2
 
-	// TriggerForIncompleteCompletions means completion was triggered to resolve incomplete items.
-	CompletionTriggerForIncompleteCompletions CompletionTriggerKind = 3
+	// Completion was re-triggered as the current completion list is incomplete.
+	CompletionTriggerKindTriggerForIncompleteCompletions CompletionTriggerKind = 3
 )
 
-// CompletionContext provides additional information about the completion request context.
+// Contains additional information about the context in which a completion request is triggered.
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#completionContext
 type CompletionContext struct {
-	// TriggerKind specifies how the completion was triggered.
+	// How the completion was triggered.
 	TriggerKind CompletionTriggerKind `json:"triggerKind"`
 
-	// TriggerCharacter is the character that triggered the completion, if applicable.
-	// This field is only populated if the triggerKind is TriggerCharacter.
-	TriggerCharacter *string `json:"triggerCharacter,omitempty"`
+	// The trigger character (a single character) that has trigger code complete.
+	// Is undefined if `triggerKind !== CompletionTriggerKindTriggerCharacter`
+	TriggerCharacter string `json:"triggerCharacter,omitempty"`
 }
 
-// CompletionParams represents the parameters for a `textDocument/completion` request.
-// It provides the text document, position, context, and optional progress tracking.
+// Completion parameters.
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#completionParams
 type CompletionParams struct {
-	// TextDocument identifies the text document where completion is being requested.
-	TextDocument TextDocumentIdentifier `json:"textDocument"`
-
-	// Position specifies the position in the document where completion is requested.
-	Position Position `json:"position"`
-
-	// Context provides additional information about the context in which completion is requested.
-	Context *CompletionContext `json:"context,omitempty"`
-
-	// WorkDoneProgressParams allows reporting progress for this request.
+	TextDocumentPositionParams
 	WorkDoneProgressParams
+	PartialResultParams
+
+	// The completion context. This is only available if the client specifies to send this using the client capability `textDocument.completion.contextSupport === true`
+	Context *CompletionContext `json:"context,omitempty"`
 }
 
-// CompletionResult represents the result of a `textDocument/completion` request.
-// It can either be a CompletionList or a slice of CompletionItem.
-type CompletionResult struct {
-	// CompletionList is populated if the result is a CompletionList.
-	CompletionList *CompletionList
+// The result of a textDocument/completion request is either an array of CompletionItem
+// or a CompletionList.
 
-	// CompletionItems is populated if the result is a slice of CompletionItem.
-	CompletionItems []CompletionItem
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#completion
+type CompletionResponse struct {
+	// When the result is a list of completion items.
+	Items []CompletionItem
+
+	// When the result is a completion list with additional metadata like isIncomplete.
+	List *CompletionList
+
+	// If null
+	Null bool
 }
 
-// MarshalJSON customizes the JSON encoding for CompletionResult.
-func (cr CompletionResult) MarshalJSON() ([]byte, error) {
-	if cr.CompletionList != nil {
-		return json.Marshal(cr.CompletionList)
+// MarshalJSON customizes the JSON encoding for CompletionResponse.
+func (cr CompletionResponse) MarshalJSON() ([]byte, error) {
+	if cr.List != nil {
+		return json.Marshal(cr.List)
 	}
-	return json.Marshal(cr.CompletionItems)
+	return json.Marshal(cr.Items)
 }
 
-// UnmarshalJSON customizes the JSON decoding for CompletionResult.
-func (cr *CompletionResult) UnmarshalJSON(data []byte) error {
-	// Try to decode as a CompletionList first.
+// UnmarshalJSON customizes the JSON decoding for CompletionResponse.
+func (cr *CompletionResponse) UnmarshalJSON(data []byte) error {
+	// Check for null
+	if string(data) == "null" {
+		cr.Null = true
+		cr.List = nil
+		cr.Items = nil
+		return nil
+	}
+
+	// Try to decode as a CompletionList.
 	var list CompletionList
 	if err := json.Unmarshal(data, &list); err == nil && list.Items != nil {
-		cr.CompletionList = &list
+		cr.Null = true
+		cr.List = &list
+		cr.Items = nil
 		return nil
 	}
 
 	// If decoding as CompletionList fails, try to decode as []CompletionItem.
 	var items []CompletionItem
 	if err := json.Unmarshal(data, &items); err == nil {
-		cr.CompletionItems = items
+		cr.Null = true
+		cr.List = nil
+		cr.Items = items
 		return nil
 	}
 
-	// If neither decoding attempt succeeds, return an error.
-	return errors.New("invalid CompletionResult: data must be a CompletionList or []CompletionItem")
+	// Unknown structure
+	return errors.New("invalid CompletionResponse: not a CompletionList, []CompletionItem or null")
 }

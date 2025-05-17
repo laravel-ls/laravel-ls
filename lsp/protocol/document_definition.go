@@ -1,53 +1,79 @@
 package protocol
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"errors"
+)
 
 const (
 	// MethodTextDocumentDefinition method name of "textDocument/definition".
 	MethodTextDocumentDefinition = "textDocument/definition"
 )
 
-// DefinitionParams represents the parameters for the `textDocument/definition` request.
-// This request is used to find the definition of a symbol at a specific position in a text document.
+// DefinitionParams defines the parameters for a textDocument/definition request.
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#definitionParams
 type DefinitionParams struct {
-	// WorkDoneProgressParams allows the client to request progress updates for the operation.
 	WorkDoneProgressParams
-
-	// PartialResultParams allows the server to send partial results for the request.
 	PartialResultParams
-
-	// TextDocument specifies the document where the symbol is located.
-	TextDocument TextDocumentIdentifier `json:"textDocument"`
-
-	// Position specifies the position within the document where the symbol is located.
-	Position Position `json:"position"`
+	TextDocumentPositionParams
 }
 
-// DefinitionResponse represents the response for the `textDocument/definition` request.
-// It can be a single Location, a slice of Locations, or a slice of LocationLinks.
+// DefinitionResponse represents the result of a textDocument/definition request.
+//
+// It can be a single Location, a slice of Locations, a slice of LocationLinks or null.
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#definition
 type DefinitionResponse struct {
-	Location      *Location      // Single Location
-	Locations     []Location     // Multiple Locations
-	LocationLinks []LocationLink // Multiple LocationLinks
+	Location      *Location
+	LocationList  []Location
+	LocationLinks []LocationLink
+	Null          bool
 }
 
-// MarshalJSON customizes the JSON encoding for DefinitionResponse.
-func (r DefinitionResponse) MarshalJSON() ([]byte, error) {
-	// If only a single Location is populated
-	if r.Location != nil {
-		return json.Marshal(r.Location)
+func (dr DefinitionResponse) MarshalJSON() ([]byte, error) {
+	if dr.Location != nil {
+		return json.Marshal(dr.Location)
 	}
-
-	// If multiple Locations are populated
-	if len(r.Locations) > 0 {
-		return json.Marshal(r.Locations)
+	if dr.LocationList != nil {
+		return json.Marshal(dr.LocationList)
 	}
-
-	// If multiple LocationLinks are populated
-	if len(r.LocationLinks) > 0 {
-		return json.Marshal(r.LocationLinks)
+	if dr.LocationLinks != nil {
+		return json.Marshal(dr.LocationLinks)
 	}
-
-	// If none are populated, return "null"
 	return []byte("null"), nil
+}
+
+func (dr *DefinitionResponse) UnmarshalJSON(data []byte) error {
+	// Make sure object is reset.
+	*dr = DefinitionResponse{}
+
+	// Check for null
+	if string(data) == "null" {
+		dr.Null = true
+		return nil
+	}
+
+	// Try single Location
+	var loc Location
+	if err := json.Unmarshal(data, &loc); err == nil && loc.URI != "" {
+		dr.Location = &loc
+		return nil
+	}
+
+	// Try []Location
+	var locList []Location
+	if err := json.Unmarshal(data, &locList); err == nil {
+		dr.LocationList = locList
+		return nil
+	}
+
+	// Try []LocationLink
+	var linkList []LocationLink
+	if err := json.Unmarshal(data, &linkList); err == nil {
+		dr.LocationLinks = linkList
+		return nil
+	}
+
+	return errors.New("invalid definition response: not null, Location, []Location, or []LocationLink")
 }

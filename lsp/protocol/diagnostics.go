@@ -1,74 +1,103 @@
 package protocol
 
-// Diagnostic represents a single diagnostic (error, warning, etc.) in a text document.
+// Represents a diagnostic, such as a compiler error or warning.
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#diagnostic
 type Diagnostic struct {
-	// Range specifies the location of the diagnostic within the document.
+	// The range at which the message applies.
 	Range Range `json:"range"`
 
-	// Severity represents the severity of the diagnostic (e.g., error, warning).
-	Severity DiagnosticSeverity `json:"severity,omitempty"`
+	// The diagnostic's severity. To avoid interpretation mismatches when a
+	// server is used with different clients it is highly recommended that
+	// servers always provide a severity value. If omitted, it’s recommended
+	// for the client to interpret it as an Error severity.
+	Severity *DiagnosticSeverity `json:"severity,omitempty"`
 
-	// Code is an optional identifier for the diagnostic, which can be a string or number.
-	Code interface{} `json:"code,omitempty"`
+	// The diagnostic's code, which might appear in the user interface.
+	Code any `json:"code,omitempty"` // integer or string
 
-	// CodeDescription provides an optional URI pointing to more information about the diagnostic code.
+	// An optional property to describe the error code.
+	//
+	// @since 3.16.0
 	CodeDescription *CodeDescription `json:"codeDescription,omitempty"`
 
-	// Source identifies the origin of this diagnostic (e.g., "typescript").
+	// A human-readable string describing the source of this
+	// diagnostic, e.g. 'typescript' or 'super lint'.
 	Source string `json:"source,omitempty"`
 
-	// Message is the diagnostic message to be displayed.
+	// The diagnostic's message.
 	Message string `json:"message"`
 
-	// Tags is an optional array of tags for additional metadata.
+	// Additional metadata about the diagnostic.
+	//
+	// @since 3.15.0
 	Tags []DiagnosticTag `json:"tags,omitempty"`
 
-	// RelatedInformation is an optional array of additional locations related to this diagnostic.
+	// An array of related diagnostic information, e.g. when symbol-names within
+	// a scope collide all definitions can be marked via this property.
 	RelatedInformation []DiagnosticRelatedInformation `json:"relatedInformation,omitempty"`
 
-	// Data provides additional metadata for the diagnostic.
-	Data interface{} `json:"data,omitempty"`
+	// A data entry field that is preserved between
+	// a `textDocument/publishDiagnostics` notification and
+	// `textDocument/codeAction` request.
+	//
+	// @since 3.16.0
+	Data LSPAny `json:"data,omitempty"`
 }
 
-// DiagnosticSeverity defines the severity level for a diagnostic.
+// The severity of a diagnostic message.
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#diagnosticSeverity
 type DiagnosticSeverity int
 
 const (
-	// SeverityError indicates an error.
-	SeverityError DiagnosticSeverity = 1
+	// Reports an error.
+	DiagnosticSeverityError DiagnosticSeverity = 1
 
-	// SeverityWarning indicates a warning.
-	SeverityWarning DiagnosticSeverity = 2
+	// Reports a warning.
+	DiagnosticSeverityWarning DiagnosticSeverity = 2
 
-	// SeverityInformation indicates an informational message.
-	SeverityInformation DiagnosticSeverity = 3
+	// Reports an information.
+	DiagnosticSeverityInformation DiagnosticSeverity = 3
 
-	// SeverityHint indicates a hint or suggestion.
-	SeverityHint DiagnosticSeverity = 4
+	// Reports a hint.
+	DiagnosticSeverityHint DiagnosticSeverity = 4
 )
 
-// DiagnosticTag represents additional metadata for diagnostics.
+// Additional metadata about a diagnostic.
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#diagnosticTag
+//
+// @since 3.15.0
 type DiagnosticTag int
 
 const (
-	// Unnecessary indicates that the diagnostic refers to code that is unnecessary or unused.
-	Unnecessary DiagnosticTag = 1
+	// Unused or unnecessary code.
+	// Clients are allowed to render diagnostics with this tag faded out instead of having
+	// an error squiggle.
+	DiagnosticTagUnnecessary DiagnosticTag = 1
 
-	// Deprecated indicates that the diagnostic refers to deprecated code.
-	Deprecated DiagnosticTag = 2
+	// Deprecated or obsolete code.
+	// Clients are allowed to rendered diagnostics with this tag strike-through.
+	DiagnosticTagDeprecated DiagnosticTag = 2
 )
 
-// CodeDescription provides a URI that points to additional information about a diagnostic code.
+// Structure to capture a description for an error code.
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#codeDescription
+//
+// @since 3.16.0
 type CodeDescription struct {
-	// Href is a URI pointing to more information about the diagnostic code.
-	Href string `json:"href"`
+	// An URI to open with more information about the diagnostic error.
+	Href DocumentURI `json:"href"`
 }
 
-// DiagnosticRelatedInformation represents additional diagnostic information related to the primary diagnostic.
+// Represents a related message and source code location for a diagnostic.
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#diagnosticRelatedInformation
 type DiagnosticRelatedInformation struct {
-	// Location is the location where this related diagnostic is reported.
+	// The location of this related diagnostic information.
 	Location Location `json:"location"`
 
-	// Message is the message to be displayed for this related diagnostic.
+	// The message of this related diagnostic information.
 	Message string `json:"message"`
 }

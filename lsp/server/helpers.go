@@ -15,8 +15,8 @@ func toTSPoint(pos protocol.Position) ts.Point {
 
 func FromTSPoint(point ts.Point) protocol.Position {
 	return protocol.Position{
-		Line:      int(point.Row),
-		Character: int(point.Column),
+		Line:      uint32(point.Row),
+		Character: uint32(point.Column),
 	}
 }
 
