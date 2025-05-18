@@ -27,7 +27,7 @@ jobs:
         run: |
           GOOS=${{matrix.os}} GOARCH=${{matrix.arch}} make
 
-      - name: Upload thalos-server
+      - name: Upload release assets
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
