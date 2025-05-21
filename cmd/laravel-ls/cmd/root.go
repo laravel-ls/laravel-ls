@@ -74,7 +74,11 @@ func run(cmd *cobra.Command, args []string) error {
 	log.SetOutput(logFile)
 	log.SetLevel(cfg.Log.Level)
 
-	log.WithField("file", viper.ConfigFileUsed()).Debug("config file used.")
+	if len(viper.ConfigFileUsed()) > 0 {
+		log.WithField("file", viper.ConfigFileUsed()).Debug("config file used.")
+	} else {
+		log.Debug("no config file used.")
+	}
 
 	providerManager := provider.NewManager(
 		viewProvider.NewProvider(),
