@@ -2,13 +2,23 @@
 GO = go
 VERSION=$(shell git describe --always --tags --dirty --match="v*")
 GOLDFLAGS=-s -w -X main.version="$(VERSION)"
-GOBUILDFLAGS+=-v -p $(shell nproc) -ldflags="$(GOLDFLAGS)"
+
+
+ifeq ($(OS), Windows_NT)
+	PROGRAM=./build/laravel-ls.exe
+	GOBUILDFLAGS+=-v -ldflags="$(GOLDFLAGS)"
+	MKBUILDDIR=
+else
+	PROGRAM=./build/laravel-ls
+	GOBUILDFLAGS+=-v -p $(shell nproc) -ldflags="$(GOLDFLAGS)"
+	MKBUILDDIR=mkdir -p ./build
+endif
 
 .PHONY: build
 
 build:
-	mkdir -p build
-	$(GO) build $(GOBUILDFLAGS) -o ./build/laravel-ls ./cmd/laravel-ls
+	$(MKBUILDDIR)
+	$(GO) build $(GOBUILDFLAGS) -o $(PROGRAM) ./cmd/laravel-ls
 
 generate: 
 	$(GO) generate ./...
