@@ -22,11 +22,11 @@ type DocumentDiagnosticParams struct {
 	TextDocument TextDocumentIdentifier `json:"textDocument"`
 
 	// The additional identifier provided during registration.
-	Identifier *string `json:"identifier,omitempty"`
+	Identifier string `json:"identifier,omitempty"`
 
 	// The current version of the document.
 	// If provided, servers can avoid computing diagnostics again if the document version hasn’t changed.
-	PreviousResultID *string `json:"previousResultId,omitempty"`
+	PreviousResultID string `json:"previousResultId,omitempty"`
 }
 
 // DocumentDiagnosticReport is either a full or an unchanged diagnostic report.
