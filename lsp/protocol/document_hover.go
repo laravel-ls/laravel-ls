@@ -92,6 +92,19 @@ type MarkupContentOrMarkedString struct {
 	MarkedStrings []MarkedString
 }
 
+func (m MarkupContentOrMarkedString) MarshalJSON() ([]byte, error) {
+	if m.Markup != nil {
+		return json.Marshal(m.Markup)
+	}
+	if m.MarkedString != nil {
+		return json.Marshal(m.MarkedString)
+	}
+	if len(m.MarkedStrings) > 0 {
+		return json.Marshal(m.MarkedStrings)
+	}
+	return nil, errors.New("one of MarkupContent, MarkedString or MarkedStrings needs to be set")
+}
+
 func (m *MarkupContentOrMarkedString) UnmarshalJSON(data []byte) error {
 	var markup MarkupContent
 	if err := json.Unmarshal(data, &markup); err == nil && markup.Kind != "" {
@@ -111,5 +124,5 @@ func (m *MarkupContentOrMarkedString) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	return errors.New("invalid contents: not MarkupContent, MarkedString, or []MarkedString")
+	return errors.New("invalid contents: not MarkupContent, MarkedString or []MarkedString")
 }
