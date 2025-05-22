@@ -80,7 +80,7 @@ type MarkedString struct {
 //
 // @since 3.0.0
 //
-// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#markupcontent
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#markupContent
 type MarkupContent struct {
 	Kind  MarkupKind `json:"kind"`
 	Value string     `json:"value"` // actual content
