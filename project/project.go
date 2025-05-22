@@ -21,7 +21,7 @@ type Project struct {
 // New initializes a new project by
 // analyzing the project in rootPath and finding a suitable php process.
 func New(rootPath string) (*Project, error) {
-	if utils.FileExists(path.Join(rootPath, "bootstrap", "app.php")) {
+	if !utils.FileExists(path.Join(rootPath, "bootstrap", "app.php")) {
 		return nil, ErrNotAnLaravelProject
 	}
 
