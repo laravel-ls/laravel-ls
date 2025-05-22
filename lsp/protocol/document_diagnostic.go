@@ -59,6 +59,16 @@ type UnchangedDocumentDiagnosticReport struct {
 	ResultID string `json:"resultId"`
 }
 
+func (r DocumentDiagnosticReport) MarshalJSON() ([]byte, error) {
+	if r.Full != nil {
+		return json.Marshal(r.Full)
+	}
+	if r.Unchanged != nil {
+		return json.Marshal(r.Unchanged)
+	}
+	return nil, fmt.Errorf("either the Full or Unchanged field needs to be set")
+}
+
 func (r *DocumentDiagnosticReport) UnmarshalJSON(data []byte) error {
 	// reset object first.
 	*r = DocumentDiagnosticReport{}
