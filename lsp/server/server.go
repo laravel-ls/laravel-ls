@@ -132,12 +132,13 @@ func (s *Server) HandleTextDocumentHover(params protocol.HoverParams) (protocol.
 	})
 
 	if len(content) > 0 {
-		contents := protocol.MarkupContent{
-			Kind:  "markup",
-			Value: content,
-		}
-		response.Hover.Contents = protocol.MarkupContentOrMarkedString{
-			Markup: &contents,
+		response.Hover = &protocol.Hover{
+			Contents: protocol.MarkupContentOrMarkedString{
+				Markup: &protocol.MarkupContent{
+					Kind:  "markup",
+					Value: content,
+				},
+			},
 		}
 	}
 	return response, nil
