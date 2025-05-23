@@ -390,9 +390,20 @@ func (s *Server) dispatch(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc
 	}
 }
 
+type jsonRPCLogger struct{}
+
+func (jsonRPCLogger) Printf(format string, v ...any) {
+	log.Tracef(format, v...)
+}
+
 func (s Server) Run(ctx context.Context, conn io.ReadWriteCloser) error {
 	stream := jsonrpc2.NewBufferedStream(conn, jsonrpc2.VSCodeObjectCodec{})
-	rpc := jsonrpc2.NewConn(ctx, stream, jsonrpc2.HandlerWithError(s.dispatch))
+
+	opts := []jsonrpc2.ConnOpt{}
+	if log.GetLevel() >= log.TraceLevel {
+		opts = append(opts, jsonrpc2.LogMessages(jsonRPCLogger{}))
+	}
+	rpc := jsonrpc2.NewConn(ctx, stream, jsonrpc2.HandlerWithError(s.dispatch), opts...)
 
 	select {
 	case <-ctx.Done():
