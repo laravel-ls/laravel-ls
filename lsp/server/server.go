@@ -6,13 +6,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"strings"
 
 	"github.com/laravel-ls/laravel-ls/cache"
 	"github.com/laravel-ls/laravel-ls/lsp/protocol"
 	"github.com/laravel-ls/laravel-ls/parser"
 	"github.com/laravel-ls/laravel-ls/program"
 	"github.com/laravel-ls/laravel-ls/provider"
+	"github.com/laravel-ls/uri"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/sourcegraph/jsonrpc2"
@@ -38,13 +38,16 @@ func NewServer(providerManager *provider.Manager) *Server {
 	}
 }
 
-func validateURI(uri string) (string, error) {
-	var err error = nil
-	path, ok := strings.CutPrefix(uri, "file://")
-	if !ok {
-		err = ErrNonLocalPath
+func validateURI(input string) (string, error) {
+	u, err := uri.Parse(input)
+	if err != nil {
+		return "", err
 	}
-	return path, err
+	if !u.HasFilename() {
+		return "", ErrNonLocalPath
+	}
+
+	return u.Filename(), nil
 }
 
 func (s *Server) HandleTextDocumentCodeAction(params protocol.CodeActionParams) ([]protocol.CodeAction, error) {
@@ -280,9 +283,11 @@ func (s Server) HandleTextDocumentDidClose(params protocol.DidCloseTextDocumentP
 }
 
 func (s *Server) HandleInitialize(params protocol.InitializeParams) (protocol.InitializeResult, error) {
-	rootPath, found := strings.CutPrefix(string(params.RootURI), "file://")
-	if !found {
+	rootPath, err := validateURI(string(params.RootURI))
+	if err == ErrNonLocalPath {
 		return protocol.InitializeResult{}, fmt.Errorf("server only support local filesystem root paths")
+	} else if err != nil {
+		return protocol.InitializeResult{}, err
 	}
 
 	log.WithField("method", protocol.MethodInitialize).
