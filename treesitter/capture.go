@@ -1,6 +1,8 @@
 package treesitter
 
 import (
+	"slices"
+
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
 
@@ -15,11 +17,8 @@ type CaptureSlice []Capture
 func (captures CaptureSlice) Name(name ...string) CaptureSlice {
 	nodes := CaptureSlice{}
 	for _, capture := range captures {
-		for _, v := range name {
-			if capture.Name == v {
-				nodes = append(nodes, capture)
-				break
-			}
+		if slices.Contains(name, capture.Name) {
+			nodes = append(nodes, capture)
 		}
 	}
 	return nodes
