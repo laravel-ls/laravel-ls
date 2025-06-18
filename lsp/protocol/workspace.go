@@ -17,7 +17,7 @@ type WorkspaceEdit struct {
 	// Changes to the workspace are described with resource operations like `RenameFile`, `CreateFile`, and `DeleteFile`.
 	//
 	// @since 3.13.0
-	DocumentChanges []LSPAny `json:"documentChanges,omitempty"`
+	DocumentChanges []DocumentChangeOperation `json:"documentChanges,omitempty"`
 
 	// A map of change annotations that can be referenced in `AnnotatedTextEdit`s or create, rename and delete file operations.
 	//
