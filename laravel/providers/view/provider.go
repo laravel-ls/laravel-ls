@@ -117,3 +117,38 @@ func (p *Provider) Hover(ctx provider.HoverContext) {
 		}
 	}
 }
+
+func (p *Provider) ResolveCodeAction(ctx provider.CodeActionContext) {
+	nodes := queries.ViewNames(ctx.File).In(ctx.Range)
+
+	for _, node := range nodes {
+		name := php.GetStringContent(node, ctx.File.Src)
+		if len(name) < 1 {
+			return
+		}
+
+		viewFile := laravel.ViewFromName(name)
+
+		if _, found := p.fs.findView(p.rootPath, viewFile.Name()); !found {
+			kind := protocol.CodeActionRefactor
+			fullPath := path.Join(p.rootPath, p.fs.paths[0], viewFile.Filename())
+			ctx.Publish(protocol.CodeAction{
+				Title: "Create view",
+				Kind:  &kind,
+				Edit: &protocol.WorkspaceEdit{
+					DocumentChanges: []protocol.DocumentChangeOperation{
+						protocol.CreateFile{
+							URI: protocol.DocumentURI("file://" + fullPath),
+							ResourceOperation: protocol.ResourceOperation{
+								Kind: "create",
+							},
+							Options: &protocol.CreateFileOptions{
+								IgnoreIfExists: true,
+							},
+						},
+					},
+				},
+			})
+		}
+	}
+}
