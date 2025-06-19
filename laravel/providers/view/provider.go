@@ -130,8 +130,7 @@ func (p *Provider) ResolveCodeAction(ctx provider.CodeActionContext) {
 
 		if _, found := p.finder.Find(name); !found {
 			for _, filename := range p.finder.PossibleFiles(name) {
-				filename, _ = filepath.Rel(p.rootPath, filename)
-				ctx.Publish(createViewCodeAction(filename))
+				ctx.Publish(createViewCodeAction(p.rootPath, filename))
 			}
 		}
 	}
