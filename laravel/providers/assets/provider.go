@@ -46,11 +46,10 @@ func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
 	if node != nil {
 		filename := php.GetStringContent(node, ctx.File.Src)
 
-		kind := protocol.CompletionItemKindFile
 		for _, file := range p.repo.Search(p.rootPath, filename) {
 			ctx.Publish(protocol.CompletionItem{
 				Label: file,
-				Kind:  &kind,
+				Kind:  protocol.CompletionItemKindFile,
 			})
 		}
 	}

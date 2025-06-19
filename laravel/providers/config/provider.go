@@ -62,12 +62,11 @@ func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
 		return
 	}
 
-	kind := protocol.CompletionItemKindFile
 	for key, meta := range repo.Find(text) {
 		ctx.Publish(protocol.CompletionItem{
 			Label:  key,
 			Detail: meta.File,
-			Kind:   &kind,
+			Kind:   protocol.CompletionItemKindFile,
 		})
 	}
 }

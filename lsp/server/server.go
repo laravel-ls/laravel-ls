@@ -174,7 +174,7 @@ func (s *Server) HandleTextDocumentDiagnostic(params protocol.DocumentDiagnostic
 					Start: FromTSPoint(start),
 					End:   FromTSPoint(end),
 				},
-				Severity: &diagnostic.Severity,
+				Severity: diagnostic.Severity,
 				Source:   program.Name,
 				Message:  diagnostic.Message,
 			})

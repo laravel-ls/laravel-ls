@@ -66,7 +66,7 @@ type CodeActionContext struct {
 
 	// The reason why code actions were requested.
 	// @since 3.17.0
-	TriggerKind *CodeActionTriggerKind `json:"triggerKind,omitempty"`
+	TriggerKind CodeActionTriggerKind `json:"triggerKind,omitempty"`
 }
 
 // A code action represents a change that can be performed in code, e.g. to fix a problem or to refactor code.
@@ -78,15 +78,15 @@ type CodeAction struct {
 
 	// The kind of the code action.
 	// Used to filter code actions.
-	Kind *CodeActionKind `json:"kind,omitempty"`
+	Kind CodeActionKind `json:"kind,omitempty"`
 
 	// The diagnostics that this code action resolves.
-	Diagnostics *[]Diagnostic `json:"diagnostics,omitempty"`
+	Diagnostics []Diagnostic `json:"diagnostics,omitempty"`
 
 	// Marks this as a preferred action.
 	// Preferred actions are used by the `auto fix` command and can be targeted by keybindings.
 	// @since 3.15.0
-	IsPreferred *bool `json:"isPreferred,omitempty"`
+	IsPreferred bool `json:"isPreferred,omitempty"`
 
 	// Marks that the code action cannot currently be applied.
 	// Clients should follow the `disabled` property to determine if the action is shown in the UI.

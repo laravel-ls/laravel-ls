@@ -11,7 +11,7 @@ type ResourceOperation struct {
 	Kind string `json:"kind"`
 
 	// An optional annotation identifier describing the operation.
-	AnnotationID *string `json:"annotationId,omitempty"`
+	AnnotationID string `json:"annotationId,omitempty"`
 }
 
 // CreateFile operation.

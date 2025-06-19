@@ -7,10 +7,8 @@ import (
 )
 
 func createViewCodeAction(filename string) protocol.CodeAction {
-	kind := protocol.CodeActionRefactor
 	return protocol.CodeAction{
 		Title: fmt.Sprintf("Create view (%s)", filename),
-		Kind:  &kind,
 		Edit: &protocol.WorkspaceEdit{
 			DocumentChanges: []protocol.DocumentChangeOperation{
 				protocol.CreateFile{

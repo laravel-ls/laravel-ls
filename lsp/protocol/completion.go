@@ -111,7 +111,7 @@ type CompletionItem struct {
 	// The kind of this completion item. Based of the kind
 	// an icon is chosen by the editor. The standardized set
 	// of available values is defined in `CompletionItemKind`.
-	Kind *CompletionItemKind `json:"kind,omitempty"`
+	Kind CompletionItemKind `json:"kind,omitempty"`
 
 	// Tags for this completion item.
 	//

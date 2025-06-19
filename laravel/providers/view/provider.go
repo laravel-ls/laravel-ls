@@ -64,7 +64,6 @@ func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
 	if node != nil {
 		input := php.GetStringContent(node, ctx.File.Src)
 
-		kind := protocol.CompletionItemKindFile
 		for _, result := range p.finder.Search(input) {
 			rel, err := filepath.Rel(p.rootPath, result.Path())
 			if err != nil {
@@ -74,7 +73,7 @@ func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
 			ctx.Publish(protocol.CompletionItem{
 				Label:  result.Name(),
 				Detail: rel,
-				Kind:   &kind,
+				Kind:   protocol.CompletionItemKindFile,
 			})
 		}
 	}

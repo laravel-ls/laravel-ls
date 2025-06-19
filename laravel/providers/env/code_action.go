@@ -5,10 +5,9 @@ import (
 )
 
 func codeAction(uri protocol.DocumentURI, title string, line int, text string) protocol.CodeAction {
-	kind := protocol.CodeActionQuickFix
 	return protocol.CodeAction{
 		Title: title,
-		Kind:  &kind,
+		Kind:  protocol.CodeActionQuickFix,
 		Edit: &protocol.WorkspaceEdit{
 			Changes: map[protocol.DocumentURI][]protocol.TextEdit{
 				uri: {

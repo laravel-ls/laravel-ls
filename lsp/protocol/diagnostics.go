@@ -10,7 +10,7 @@ type Diagnostic struct {
 	// server is used with different clients it is highly recommended that
 	// servers always provide a severity value. If omitted, it’s recommended
 	// for the client to interpret it as an Error severity.
-	Severity *DiagnosticSeverity `json:"severity,omitempty"`
+	Severity DiagnosticSeverity `json:"severity,omitempty"`
 
 	// The diagnostic's code, which might appear in the user interface.
 	Code any `json:"code,omitempty"` // integer or string

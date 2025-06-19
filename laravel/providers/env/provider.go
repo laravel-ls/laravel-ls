@@ -151,12 +151,11 @@ func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
 
 		text := php.GetStringContent(node, ctx.File.Src)
 
-		kind := protocol.CompletionItemKindConstant
 		for key, meta := range p.repo.Find(text) {
 			ctx.Publish(protocol.CompletionItem{
 				Label:  key,
 				Detail: meta.Value,
-				Kind:   &kind,
+				Kind:   protocol.CompletionItemKindConstant,
 			})
 		}
 	}
