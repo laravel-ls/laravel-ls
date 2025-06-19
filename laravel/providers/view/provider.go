@@ -1,7 +1,6 @@
 package view
 
 import (
-	"fmt"
 	"path"
 	"path/filepath"
 
@@ -133,21 +132,7 @@ func (p *Provider) ResolveCodeAction(ctx provider.CodeActionContext) {
 		if _, found := p.finder.Find(name); !found {
 			for _, filename := range p.finder.PossibleFiles(name) {
 				filename, _ = filepath.Rel(p.rootPath, filename)
-				kind := protocol.CodeActionRefactor
-				ctx.Publish(protocol.CodeAction{
-					Title: fmt.Sprintf("Create view (%s)", filename),
-					Kind:  &kind,
-					Edit: &protocol.WorkspaceEdit{
-						DocumentChanges: []protocol.DocumentChangeOperation{
-							protocol.CreateFile{
-								URI: protocol.DocumentURI("file://" + filename),
-								ResourceOperation: protocol.ResourceOperation{
-									Kind: "create",
-								},
-							},
-						},
-					},
-				})
+				ctx.Publish(createViewCodeAction(filename))
 			}
 		}
 	}
