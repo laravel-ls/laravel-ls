@@ -255,7 +255,7 @@ func (s Server) HandleTextDocumentDidChange(params protocol.DidChangeTextDocumen
 
 		err := file.Update(start, end, []byte(change.Text))
 		if err != nil {
-			errs = errors.Join(err)
+			errs = errors.Join(errs, err)
 		}
 	}
 
