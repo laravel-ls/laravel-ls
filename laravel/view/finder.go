@@ -71,8 +71,8 @@ func (finder Finder) PossibleFiles(name string) []string {
 	return files
 }
 
-// Lists all view files starting with a prefix in their name.
-func (finder Finder) Search(prefix string) []View {
+// Lists all view files containing the input string in their name.
+func (finder Finder) Search(input string) []View {
 	var matches []View
 
 	for _, basePath := range finder.paths {
@@ -83,14 +83,12 @@ func (finder Finder) Search(prefix string) []View {
 
 			if ext := finder.matchingExtension(fullPath); ext != "" {
 				name := finder.viewNameFromPath(basePath, fullPath, ext)
-				if !strings.HasPrefix(name, prefix) {
-					return nil
+				if strings.Contains(name, input) {
+					matches = append(matches, View{
+						name: name,
+						path: fullPath,
+					})
 				}
-
-				matches = append(matches, View{
-					name: name,
-					path: fullPath,
-				})
 			}
 			return nil
 		})

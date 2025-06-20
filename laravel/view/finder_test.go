@@ -48,9 +48,8 @@ func Test_Search(t *testing.T) {
 	finder.AddLocation("/var/www/project/resources/views")
 	finder.AddLocation("/var/www/project/other")
 
-	views := finder.Search("co")
-	require.Len(t, views, 3)
+	views := finder.Search("components")
+	require.Len(t, views, 2)
 	require.Equal(t, *view.NewView("/var/www/project/resources/views/components/card/index.blade.php", "components.card.index"), views[0])
-	require.Equal(t, *view.NewView("/var/www/project/resources/views/contact.php", "contact"), views[1])
-	require.Equal(t, *view.NewView("/var/www/project/other/components/badge/index.php", "components.badge.index"), views[2])
+	require.Equal(t, *view.NewView("/var/www/project/other/components/badge/index.php", "components.badge.index"), views[1])
 }
