@@ -8,6 +8,10 @@ import (
 	"strings"
 )
 
+type Process interface {
+	Exec(workingDir string, code []byte) (io.Reader, error)
+}
+
 // PHPProcess represents a PHP execution process with configurable arguments.
 type PHPProcess struct {
 	Args []string
