@@ -8,15 +8,15 @@ import (
 
 var ErrNoBinary = errors.New("failed to find php binary")
 
-// PHPProcessLocator is a function type that returns a pointer to a PHPProccess.
+// PHPProcessLocator is a function type that returns a pointer to a PHPProcess.
 // It's used to locate a valid PHP executable in different environments.
-type PHPProcessLocator func() *PHPProccess
+type PHPProcessLocator func() *PHPProcess
 
 // sail checks if the Laravel Sail binary is available
 // (and sail is running) and returns a PHPProcessLocator that can be used to execute code inside sail.
 func sail(rootPath string) PHPProcessLocator {
 	sailBinary := path.Join(rootPath, "vendor/bin/sail")
-	return func() *PHPProccess {
+	return func() *PHPProcess {
 		// Check if sail is running
 		if err := exec.Command(sailBinary, "ps").Run(); err == nil {
 			return NewPHPProcess(sailBinary, "php", "-r")
@@ -26,7 +26,7 @@ func sail(rootPath string) PHPProcessLocator {
 }
 
 // local searches for the system PHP binary in the system's PATH.
-func local() *PHPProccess {
+func local() *PHPProcess {
 	p, err := exec.LookPath("php")
 	if err != nil {
 		return nil
@@ -34,7 +34,7 @@ func local() *PHPProccess {
 	return NewPHPProcess(p, "-r")
 }
 
-func FindPHPProcess(rootPath string) (*PHPProccess, error) {
+func FindPHPProcess(rootPath string) (*PHPProcess, error) {
 	locators := []PHPProcessLocator{
 		sail(rootPath),
 		local,
