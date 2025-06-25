@@ -1,6 +1,7 @@
 package view_test
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/laravel-ls/laravel-ls/laravel/view"
@@ -20,15 +21,15 @@ func Test_Find(t *testing.T) {
 
 	path, found := finder.Find("index")
 	require.True(t, found)
-	require.Equal(t, "/var/www/project/resources/views/index.blade.php", path)
+	require.Equal(t, filepath.FromSlash("/var/www/project/resources/views/index.blade.php"), path)
 
 	path, found = finder.Find("partials.header")
 	require.True(t, found)
-	require.Equal(t, "/var/www/project/resources/views/partials/header.php", path)
+	require.Equal(t, filepath.FromSlash("/var/www/project/resources/views/partials/header.php"), path)
 
 	path, found = finder.Find("module1.component")
 	require.True(t, found)
-	require.Equal(t, "/var/www/project/other/module1/component.php", path)
+	require.Equal(t, filepath.FromSlash("/var/www/project/other/module1/component.php"), path)
 
 	path, found = finder.Find("does.not.exist")
 	require.False(t, found)
@@ -50,6 +51,6 @@ func Test_Search(t *testing.T) {
 
 	views := finder.Search("components")
 	require.Len(t, views, 2)
-	require.Equal(t, *view.NewView("/var/www/project/resources/views/components/card/index.blade.php", "components.card.index"), views[0])
-	require.Equal(t, *view.NewView("/var/www/project/other/components/badge/index.php", "components.badge.index"), views[1])
+	require.Equal(t, *view.NewView(filepath.FromSlash("/var/www/project/resources/views/components/card/index.blade.php"), "components.card.index"), views[0])
+	require.Equal(t, *view.NewView(filepath.FromSlash("/var/www/project/other/components/badge/index.php"), "components.badge.index"), views[1])
 }
