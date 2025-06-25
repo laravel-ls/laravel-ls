@@ -11,10 +11,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ linux ]
+        os: [ linux, windows ]
         arch: [ amd64 ]
     name: Release - ${{matrix.os}}-${{matrix.arch}}
     runs-on: ubuntu-24.04
+    env:
+      GOOS: ${{matrix.os}}
+      GOARCH: ${{matrix.arch}}
     steps:
       - uses: actions/checkout@v4
 
@@ -23,9 +26,18 @@ jobs:
         with:
           go-version: 1.22
 
-      - name: compile
+      - name: Setup MinGW
+        if: ${{ env.GOOS == 'windows' }}
         run: |
-          GOOS=${{matrix.os}} GOARCH=${{matrix.arch}} make
+          sudo apt install g++-mingw-w64-x86-64 gcc-mingw-w64-x86-64
+          echo "CGO_ENABLED=1" >> $GITHUB_ENV
+          echo "CC=/usr/bin/x86_64-w64-mingw32-gcc" >> $GITHUB_ENV
+
+      - name: compile
+        id: compile
+        run: | 
+          make
+          echo "binary=$(find build -type f | head -1)" >> "$GITHUB_OUTPUT"
 
       - name: Upload release assets
         uses: actions/upload-release-asset@v1
@@ -34,6 +46,6 @@ jobs:
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_name: laravel-ls-${{github.event.release.tag_name}}-${{matrix.os}}-${{matrix.arch}}
-          asset_path: build/laravel-ls
+          asset_path: ${{ steps.compile.outputs.binary }}
           asset_content_type: application/octal-stream
 
