@@ -27,7 +27,7 @@ func Test_JsonError(t *testing.T) {
 	r := result{}
 
 	ret, err := runtime.CallScript(proc, "/tmp/root", []byte("code"), &r)
-	require.EqualError(t, err, "invalid character 'N' looking for beginning of value")
+	require.EqualError(t, err, "json: invalid character 'N' looking for beginning of value")
 	require.Equal(t, ret, &r)
 }
 
