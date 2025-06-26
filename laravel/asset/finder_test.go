@@ -1,7 +1,8 @@
+//go:build !windows
+
 package asset_test
 
 import (
-	"path/filepath"
 	"testing"
 
 	"github.com/laravel-ls/laravel-ls/laravel/asset"
@@ -18,8 +19,8 @@ func Test_Search(t *testing.T) {
 	finder := asset.NewFinder(fs, "/var/www/project")
 	result := finder.Search("app")
 	require.Len(t, result, 2)
-	require.Equal(t, filepath.FromSlash("/var/www/project/public/css/app.css"), result[0])
-	require.Equal(t, filepath.FromSlash("/var/www/project/public/js/app.js"), result[1])
+	require.Equal(t, "/var/www/project/public/css/app.css", result[0])
+	require.Equal(t, "/var/www/project/public/js/app.js", result[1])
 }
 
 func Test_Exists(t *testing.T) {
