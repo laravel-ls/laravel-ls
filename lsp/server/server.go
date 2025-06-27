@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/laravel-ls/laravel-ls/cache"
 	"github.com/laravel-ls/laravel-ls/lsp/protocol"
@@ -386,8 +387,23 @@ func (s *Server) dispatch(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc
 		log.WithField("method", protocol.MethodInitialized).
 			Debug("Initialized")
 		return nil, nil
+	case "$/cancelRequest":
+		// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#cancelRequest
+		// TODO: Maybe implement a way to cancel requests?
+		return nil, nil
+	case "shutdown":
+		// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#shutdown
+		// TODO: Implement shutdown logic if needed - ie. clear temp files, close connections, etc.
+		log.Info("Received shutdown request")
+		return nil, nil
+	case "exit":
+		// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#exit
+		log.Info("Received exit request")
+		// TODO: "The server should exit with success code 0 if the shutdown request has been received before; otherwise with error code 1."
+		os.Exit(0)
+		return nil, nil
 	default:
-		// Respond with a method not found error
+		log.WithField("method", req.Method).Warn("LSP method not found")
 		return nil, &jsonrpc2.Error{
 			Code:    jsonrpc2.CodeMethodNotFound,
 			Message: fmt.Sprintf("Method %s not found", req.Method),
@@ -408,6 +424,7 @@ func (s Server) Run(ctx context.Context, conn io.ReadWriteCloser) error {
 	if log.GetLevel() >= log.TraceLevel {
 		opts = append(opts, jsonrpc2.LogMessages(jsonRPCLogger{}))
 	}
+	log.Info("Started laravel-ls server")
 	rpc := jsonrpc2.NewConn(ctx, stream, jsonrpc2.HandlerWithError(s.dispatch), opts...)
 
 	select {
