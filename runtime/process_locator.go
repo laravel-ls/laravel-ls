@@ -19,7 +19,7 @@ func sail(rootPath string) PHPProcessLocator {
 	return func() *PHPProcess {
 		// Check if sail is running
 		if err := exec.Command(sailBinary, "ps").Run(); err == nil {
-			return NewPHPProcess(sailBinary, "php", "-r")
+			return NewPHPProcess(sailBinary, "php", "-f")
 		}
 		return nil
 	}
@@ -31,7 +31,7 @@ func local() *PHPProcess {
 	if err != nil {
 		return nil
 	}
-	return NewPHPProcess(p, "-r")
+	return NewPHPProcess(p, "-f")
 }
 
 func FindPHPProcess(rootPath string) (*PHPProcess, error) {
