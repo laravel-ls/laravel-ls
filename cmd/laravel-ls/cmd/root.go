@@ -111,7 +111,7 @@ func bindFlagsToConfig(flags *pflag.FlagSet) {
 	must(viper.BindPFlag("log.level", flags.Lookup("log-level")))
 }
 
-func Run() {
+func Run() int {
 	cmd := cobra.Command{
 		Use:     program.Name,
 		Short:   "Language server for Laravel",
@@ -128,9 +128,11 @@ func Run() {
 
 	if err := cmd.Execute(); err != nil {
 		log.WithError(err).Error("Error")
+		return 1
 	}
 
 	if logFile != nil {
 		logFile.Close()
 	}
+	return 0
 }
