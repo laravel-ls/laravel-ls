@@ -26,7 +26,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-var basePath string
+var (
+	basePath string
+	logFile  *os.File
+)
 
 // Expand "~" to user's home directory.
 func expandHome(path string) string {
@@ -65,11 +68,10 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	logFile, err := openLogFile(cfg.Log.Filename)
+	logFile, err = openLogFile(cfg.Log.Filename)
 	if err != nil {
 		return err
 	}
-	defer logFile.Close()
 
 	log.SetOutput(logFile)
 	log.SetLevel(cfg.Log.Level)
@@ -109,7 +111,7 @@ func bindFlagsToConfig(flags *pflag.FlagSet) {
 	must(viper.BindPFlag("log.level", flags.Lookup("log-level")))
 }
 
-func Run() error {
+func Run() {
 	cmd := cobra.Command{
 		Use:     program.Name,
 		Short:   "Language server for Laravel",
@@ -124,5 +126,11 @@ func Run() error {
 
 	bindFlagsToConfig(cmd.PersistentFlags())
 
-	return cmd.Execute()
+	if err := cmd.Execute(); err != nil {
+		log.WithError(err).Error("Error")
+	}
+
+	if logFile != nil {
+		logFile.Close()
+	}
 }
