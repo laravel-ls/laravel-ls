@@ -14,6 +14,7 @@ linters:
       - legacy
       - std-error-handling
     paths:
+      - _test.go$
       - third_party$
       - builtin$
       - examples$
