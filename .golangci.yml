@@ -1,12 +1,31 @@
+version: "2"
 linters:
   enable:
-    - stylecheck
+    - staticcheck
+  settings:
+    staticcheck:
+      checks:
+        - all
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
     - gofumpt
-
-linters-settings:
-  gofumpt:
-    module-path: laravel-ls
-  stylecheck:
-    checks:
-      - all
-
+  settings:
+    gofumpt:
+      module-path: laravel-ls
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
