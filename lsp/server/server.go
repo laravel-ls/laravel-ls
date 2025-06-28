@@ -28,6 +28,10 @@ type Server struct {
 	// Map of open files for this session
 	cache *cache.FileCache
 
+	// flag if shutdown request has been received.
+	// if a connection is closed without this request, it is an error.
+	shutdownReceived bool
+
 	providerManager *provider.Manager
 }
 
@@ -394,6 +398,7 @@ func (s *Server) dispatch(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc
 		// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#shutdown
 		// TODO: Implement shutdown logic if needed - ie. clear temp files, close connections, etc.
 		log.Info("Received shutdown request")
+		s.shutdownReceived = true
 		return nil, nil
 	case "exit":
 		// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#exit
@@ -430,6 +435,9 @@ func (s Server) Run(ctx context.Context, conn io.ReadWriteCloser) error {
 	case <-ctx.Done():
 		return fmt.Errorf("context closed")
 	case <-rpc.DisconnectNotify():
+		if !s.shutdownReceived {
+			return fmt.Errorf("disconnected without an shutdown request")
+		}
 		return nil
 	}
 }
