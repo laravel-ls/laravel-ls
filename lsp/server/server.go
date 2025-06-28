@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 
 	"github.com/laravel-ls/laravel-ls/cache"
 	"github.com/laravel-ls/laravel-ls/lsp/protocol"
@@ -400,7 +399,7 @@ func (s *Server) dispatch(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc
 		// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#exit
 		log.Info("Received exit request")
 		// TODO: "The server should exit with success code 0 if the shutdown request has been received before; otherwise with error code 1."
-		os.Exit(0)
+		conn.Close()
 		return nil, nil
 	default:
 		log.WithField("method", req.Method).Warn("LSP method not found")
