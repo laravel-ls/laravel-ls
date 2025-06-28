@@ -402,8 +402,7 @@ func (s *Server) dispatch(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc
 		return nil, nil
 	case "exit":
 		// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#exit
-		log.Info("Received exit request")
-		// TODO: "The server should exit with success code 0 if the shutdown request has been received before; otherwise with error code 1."
+		log.Info("Received exit notification")
 		conn.Close()
 		return nil, nil
 	default:
