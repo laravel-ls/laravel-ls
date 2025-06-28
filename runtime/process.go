@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -28,17 +29,30 @@ func NewPHPProcess(args ...string) *PHPProcess {
 	}
 }
 
+func (proc PHPProcess) vendorDir(workingDir string) (string, error) {
+	tmpDir := path.Join(workingDir, "vendor", "_laravel-ls")
+	if err := os.MkdirAll(tmpDir, 0o755); err != nil {
+		return "", err
+	}
+	return tmpDir, nil
+}
+
 // Exec executes the PHP code in the specified working directory.
 // It returns an io.Reader with the output or an error if execution fails.
 func (proc PHPProcess) Exec(workingDir string, code []byte) (io.Reader, error) {
 	outBuf := &bytes.Buffer{}
 	errBuf := &strings.Builder{}
 
+	vendorDir, err := proc.vendorDir(workingDir)
+	if err != nil {
+		return nil, err
+	}
+	
 	// hash code content for temporary file name
 	hash := md5.New()
 	hash.Write(code)
 	hashValue := hash.Sum(nil)
-	filePath := path.Join(os.TempDir(), fmt.Sprintf("laravel-ls-%x.php", hashValue))
+	filePath := path.Join(vendorDir, fmt.Sprintf("laravel-ls-%x.php", hashValue))
 
 	// Check if the temporary file already exists
 	if _, err := os.Stat(filePath); err != nil {
@@ -53,7 +67,11 @@ func (proc PHPProcess) Exec(workingDir string, code []byte) (io.Reader, error) {
 		}
 	}
 
-	cmd := exec.Command(proc.Args[0], append(proc.Args[1:], filePath)...)
+
+	// Get the file relative to the working directory
+	relFilePath, _ := filepath.Rel(workingDir, filePath)
+
+	cmd := exec.Command(proc.Args[0], append(proc.Args[1:], relFilePath)...)
 	cmd.Dir = workingDir
 	cmd.Stdout = outBuf
 	cmd.Stderr = errBuf
