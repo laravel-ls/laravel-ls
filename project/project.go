@@ -51,6 +51,11 @@ func (project Project) Configs() (repository.ConfigRepository, error) {
 	return runtime.CallScript(project.process, project.rootPath, configScript, repository.ConfigRepository{})
 }
 
+// Routes retrieves the routes repository in the project
+func (project Project) Routes() (repository.RouteRepository, error) {
+	return runtime.CallScript(project.process, project.rootPath, routeScript, repository.RouteRepository{})
+}
+
 // AppBindings retrieves the application bindings repository in the project
 func (project Project) AppBindings() (repository.AppRepository, error) {
 	return runtime.CallScript(project.process, project.rootPath, appScript, repository.AppRepository{})

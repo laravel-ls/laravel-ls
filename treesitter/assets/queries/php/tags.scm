@@ -35,7 +35,7 @@
     (qualified_name (name) @class)
     (name) @class
   ] (#eq? @class "Config")
-  name: (name) @method 
+  name: (name) @method
   (#any-of? @method "get" "integer" "float" "string" "boolean" "array")
   arguments: (arguments
      . (argument [
@@ -226,3 +226,19 @@
     ])
   ))
 
+; --------------------------------------------------
+;  Routes
+; --------------------------------------------------
+
+; route(), signedRoute(), to_route() calls
+(function_call_expression
+    function: (name) @function
+        (#any-of? @function "route" "signedRoute" "to_route")
+    arguments: (arguments
+        . (argument [
+                (string (string_content)?) @route.name
+                (encapsed_string . (string_content) .) @route.name
+                (encapsed_string "\"" . "\"") @route.name
+        ])
+    )
+)
