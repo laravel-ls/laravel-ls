@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-    <img src="https://img.shields.io/github/go-mod/go-version/laravel-ls/laravel-ls" />
+    <img src="https://img.shields.io/github/go-mod/go-version/laravel-ls/laravel-ls?style=for-the-badge" />
     <a href="https://github.com/laravel-ls/laravel-ls/blob/main/LICENSE">
         <img src="https://img.shields.io/github/license/laravel-ls/laravel-ls?style=for-the-badge" />
     </a>
