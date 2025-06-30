@@ -49,10 +49,7 @@ func (proc PHPProcess) Exec(workingDir string, code []byte) (io.Reader, error) {
 	}
 	
 	// hash code content for temporary file name
-	hash := md5.New()
-	hash.Write(code)
-	hashValue := hash.Sum(nil)
-	filePath := path.Join(vendorDir, fmt.Sprintf("laravel-ls-%x.php", hashValue))
+	filePath := path.Join(vendorDir, fmt.Sprintf("laravel-ls-%x.php", md5.Sum(code)))
 
 	// Check if the temporary file already exists
 	if _, err := os.Stat(filePath); err != nil {
