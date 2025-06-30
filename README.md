@@ -12,18 +12,14 @@
     <a href="#build">Building</a>
 </p>
 
-<p align="center">
-    <img src="https://img.shields.io/github/go-mod/go-version/laravel-ls/laravel-ls?style=for-the-badge" />
-    <a href="https://github.com/laravel-ls/laravel-ls/blob/main/LICENSE">
-        <img src="https://img.shields.io/github/license/laravel-ls/laravel-ls?style=for-the-badge" />
-    </a>
-    <a href="https://github.com/laravel-ls/laravel-ls/actions/workflows/test.yml">
-        <img src="https://img.shields.io/github/actions/workflow/status/laravel-ls/laravel-ls/test.yml?style=for-the-badge&label=test" />
-    </a>
-    <a href="https://github.com/laravel-ls/laravel-ls/releases">
-        <img src="https://img.shields.io/github/v/release/laravel-ls/laravel-ls?include_prereleases&style=for-the-badge" />
-    </a>
-</p>
+<div align="center">
+
+![Go Version](https://img.shields.io/github/go-mod/go-version/laravel-ls/laravel-ls?style=for-the-badge)
+[![License](https://img.shields.io/github/license/laravel-ls/laravel-ls?style=for-the-badge)](/LICENSE)
+[![Test](https://img.shields.io/github/actions/workflow/status/laravel-ls/laravel-ls/test.yml?style=for-the-badge&label=test)](https://github.com/laravel-ls/laravel-ls/actions/workflows/test.yml)
+[![Release](https://img.shields.io/github/v/release/laravel-ls/laravel-ls?include_prereleases&style=for-the-badge)](https://github.com/laravel-ls/laravel-ls/releases/latest)
+
+</div>
 
 ## About
 
