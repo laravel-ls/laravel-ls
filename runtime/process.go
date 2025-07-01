@@ -47,7 +47,7 @@ func (proc PHPProcess) Exec(workingDir string, code []byte) (io.Reader, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// hash code content for temporary file name
 	filePath := path.Join(vendorDir, fmt.Sprintf("laravel-ls-%x.php", md5.Sum(code)))
 
@@ -63,7 +63,6 @@ func (proc PHPProcess) Exec(workingDir string, code []byte) (io.Reader, error) {
 			f.Close()
 		}
 	}
-
 
 	// Get the file relative to the working directory
 	relFilePath, _ := filepath.Rel(workingDir, filePath)
