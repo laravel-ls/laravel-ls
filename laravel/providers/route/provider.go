@@ -116,13 +116,12 @@ func (p *Provider) ResolveDefinition(ctx provider.DefinitionContext) {
 			// TODO: Maybe refactor this into a helper function
 			Range: protocol.Range{
 				Start: protocol.Position{
-					Line:      uint32(node.Range().StartPoint.Row),
-					Character: uint32(node.Range().StartPoint.Column),
+					Line: uint32(meta.Line),
 				},
 				End: protocol.Position{
-					Line:      uint32(node.Range().EndPoint.Row),
-					Character: uint32(node.Range().EndPoint.Column),
+					Line: uint32(meta.Line),
 				},
+
 			},
 		})
 	}
