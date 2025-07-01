@@ -121,7 +121,6 @@ func (p *Provider) ResolveDefinition(ctx provider.DefinitionContext) {
 				End: protocol.Position{
 					Line: uint32(meta.Line),
 				},
-
 			},
 		})
 	}
