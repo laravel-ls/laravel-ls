@@ -28,6 +28,10 @@ type Server struct {
 	// Map of open files for this session
 	cache *cache.FileCache
 
+	// flag if shutdown request has been received.
+	// if a connection is closed without this request, it is an error.
+	shutdownReceived bool
+
 	providerManager *provider.Manager
 }
 
@@ -386,8 +390,23 @@ func (s *Server) dispatch(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc
 		log.WithField("method", protocol.MethodInitialized).
 			Debug("Initialized")
 		return nil, nil
+	case "$/cancelRequest":
+		// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#cancelRequest
+		// TODO: Maybe implement a way to cancel requests?
+		return nil, nil
+	case "shutdown":
+		// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#shutdown
+		// TODO: Implement shutdown logic if needed - ie. clear temp files, close connections, etc.
+		log.Info("Received shutdown request")
+		s.shutdownReceived = true
+		return nil, nil
+	case "exit":
+		// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#exit
+		log.Info("Received exit notification")
+		conn.Close()
+		return nil, nil
 	default:
-		// Respond with a method not found error
+		log.WithField("method", req.Method).Warn("LSP method not found")
 		return nil, &jsonrpc2.Error{
 			Code:    jsonrpc2.CodeMethodNotFound,
 			Message: fmt.Sprintf("Method %s not found", req.Method),
@@ -408,12 +427,16 @@ func (s Server) Run(ctx context.Context, conn io.ReadWriteCloser) error {
 	if log.GetLevel() >= log.TraceLevel {
 		opts = append(opts, jsonrpc2.LogMessages(jsonRPCLogger{}))
 	}
+	log.Info("Started laravel-ls server")
 	rpc := jsonrpc2.NewConn(ctx, stream, jsonrpc2.HandlerWithError(s.dispatch), opts...)
 
 	select {
 	case <-ctx.Done():
 		return fmt.Errorf("context closed")
 	case <-rpc.DisconnectNotify():
+		if !s.shutdownReceived {
+			return fmt.Errorf("disconnected without an shutdown request")
+		}
 		return nil
 	}
 }

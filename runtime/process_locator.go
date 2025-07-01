@@ -15,10 +15,12 @@ type PHPProcessLocator func() *PHPProcess
 // sail checks if the Laravel Sail binary is available
 // (and sail is running) and returns a PHPProcessLocator that can be used to execute code inside sail.
 func sail(rootPath string) PHPProcessLocator {
-	sailBinary := path.Join(rootPath, "vendor/bin/sail")
+	sailBinary := path.Join("vendor", "bin", "sail")
 	return func() *PHPProcess {
 		// Check if sail is running
-		if err := exec.Command(sailBinary, "ps").Run(); err == nil {
+		cmd := exec.Command(sailBinary, "ps")
+		cmd.Dir = rootPath // sail needs to be executed from rootPath
+		if err := cmd.Run(); err == nil {
 			return NewPHPProcess(sailBinary, "php", "-f")
 		}
 		return nil

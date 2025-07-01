@@ -23,7 +23,7 @@ func NewFinder(fs afero.Fs, rootPath string) *Finder {
 func (finder Finder) Search(search string) []string {
 	files := []string{}
 
-	afero.Walk(finder.fs, finder.rootPath, func(fullPath string, info os.FileInfo, err error) error {
+	_ = afero.Walk(finder.fs, finder.rootPath, func(fullPath string, info os.FileInfo, err error) error {
 		if err == nil && !info.IsDir() && strings.Contains(fullPath, search) {
 			files = append(files, fullPath)
 		}

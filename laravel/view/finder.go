@@ -76,7 +76,7 @@ func (finder Finder) Search(input string) []View {
 	var matches []View
 
 	for _, basePath := range finder.paths {
-		afero.Walk(finder.fs, basePath, func(fullPath string, info os.FileInfo, err error) error {
+		_ = afero.Walk(finder.fs, basePath, func(fullPath string, info os.FileInfo, err error) error {
 			if err != nil || info.IsDir() {
 				return nil
 			}
