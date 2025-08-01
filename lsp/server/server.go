@@ -313,7 +313,10 @@ func (s *Server) HandleInitialize(params protocol.InitializeParams) (protocol.In
 				TriggerCharacters: []string{"'", "\""},
 			},
 			DefinitionProvider: true,
-			DiagnosticProvider: true,
+			DiagnosticProvider: protocol.DiagnosticOptions{
+				InterFileDependencies: true,
+				WorkspaceDiagnostics:  false,
+			},
 			CodeActionProvider: true,
 		},
 		ServerInfo: &protocol.ServerInfo{
