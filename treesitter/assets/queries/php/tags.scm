@@ -216,6 +216,20 @@
 ;  Assets
 ; --------------------------------------------------
 
+; URL::asset() calls.
+(scoped_call_expression
+  scope: [
+    (qualified_name (name) @class)
+    (name) @class
+  ] (#eq? @class "URL")
+  name: (name) @method (#eq? @method "asset")
+  arguments: (arguments
+    . (argument [
+          (string (string_content)?) @asset.filename
+          (encapsed_string (string_content)?) @asset.filename
+      ])
+))
+
 ; asset() calls
 (function_call_expression
   function: (name) @function (#eq? @function "asset")
