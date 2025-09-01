@@ -145,7 +145,11 @@ asset('main.css');
 
 ###  Download via github
 
-Official binaries for linux are provided on each [github release](https://github.com/laravel-ls/laravel-ls/releases)
+Official binaries for Windows and Linux are provided on each [github release](https://github.com/laravel-ls/laravel-ls/releases)
+
+MacOS users have to use [Install via go](#install-via-go) 
+
+> NOTE: although MacOS is not officially supported, some users have had success building it.
 
 Just download the program and make sure its located somewhere in your `$PATH`
 
@@ -155,9 +159,9 @@ sudo wget -O /usr/local/bin/laravel-ls https://github.com/laravel-ls/laravel-ls/
    sudo chmod 755 /usr/local/bin/laravel-ls
 ```
 
-### Download via go
+### Install via go
 
-The program can be installed via go:
+The program can be compiled and installed via go:
 
 ```sh
 go install github.com/laravel-ls/laravel-ls/cmd/laravel-ls@latest
@@ -174,6 +178,8 @@ See the official documentation of [go install](https://go.dev/ref/mod#go-install
 ## Build
 
 To build the project you need golang version `1.22` or later, `make` and a c compiler.
+
+The project officially supports building Windows and Linux binaries. But some users have had success on MacOS.
 
 When the dependencies are met, running `make` will compile and produce the
 binary `build/laravel-ls`.
