@@ -11,12 +11,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ linux, windows ]
+        os: [ ubuntu-24.04, windows-latest, macos-15-intel ]
         arch: [ amd64 ]
     name: Release - ${{matrix.os}}-${{matrix.arch}}
-    runs-on: ubuntu-24.04
+    runs-on: ${{matrix.os}}
     env:
-      GOOS: ${{matrix.os}}
       GOARCH: ${{matrix.arch}}
     steps:
       - uses: actions/checkout@v4
@@ -26,16 +25,11 @@ jobs:
         with:
           go-version: 1.22
 
-      - name: Setup MinGW
-        if: ${{ env.GOOS == 'windows' }}
-        run: |
-          sudo apt install g++-mingw-w64-x86-64 gcc-mingw-w64-x86-64
-          echo "CGO_ENABLED=1" >> "$GITHUB_ENV"
-          echo "CC=/usr/bin/x86_64-w64-mingw32-gcc" >> "$GITHUB_ENV"
-
       - name: compile
         id: compile
+        shell: bash
         run: | 
+          echo "os=$(go env GOOS)" >> "$GITHUB_OUTPUT"
           make
           echo "binary=$(find build -type f | head -1)" >> "$GITHUB_OUTPUT"
 
@@ -45,7 +39,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_name: laravel-ls-${{github.event.release.tag_name}}-${{matrix.os}}-${{matrix.arch}}
+          asset_name: laravel-ls-${{github.event.release.tag_name}}-${{steps.compile.outputs.os}}-${{matrix.arch}}
           asset_path: ${{ steps.compile.outputs.binary }}
           asset_content_type: application/octal-stream
 
