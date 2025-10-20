@@ -177,7 +177,7 @@ See the official documentation of [go install](https://go.dev/ref/mod#go-install
 
 ## Build
 
-To build the project you need golang version `1.22` or later, `make` and a c compiler.
+To build the project you need golang version `1.23` or later, `make` and a c compiler.
 
 The project officially supports building Windows and Linux binaries. But some users have had success on MacOS.
 
