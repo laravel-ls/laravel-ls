@@ -13,9 +13,9 @@ jobs:
       fail-fast: false
       matrix:
         go-version: ["1.22"]
-        os: [ ubuntu-24.04, windows-latest ]
+        os: [ ubuntu-24.04, windows-latest, macos-15-intel ]
         arch: [ amd64 ]
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{matrix.os}}
     name: ${{ matrix.os }} (${{matrix.arch}} go v${{ matrix.go-version }})
     env:
       GOARCH: ${{matrix.arch}}
