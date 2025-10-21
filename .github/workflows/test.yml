@@ -20,6 +20,8 @@ jobs:
             arch: amd64
           - os: ubuntu-24.04
             arch: arm64
+          - os: macos-15-intel
+            arch: arm64
           - os: windows-latest
             arch: arm64
     runs-on: ${{matrix.os}}
