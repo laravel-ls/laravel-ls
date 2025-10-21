@@ -21,9 +21,11 @@ linters:
 formatters:
   enable:
     - gofumpt
+    - goimports
   settings:
     gofumpt:
       module-path: laravel-ls
+      extra-rules: true
   exclusions:
     generated: lax
     paths:
