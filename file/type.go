@@ -23,7 +23,7 @@ func hasExtension(ext string) checkFn {
 }
 
 func envFile(filename string) bool {
-	return strings.HasPrefix(filename, ".env")
+	return filename == ".env" || strings.HasPrefix(filename, ".env.")
 }
 
 // TypeByFilename finds the filetype based on filename

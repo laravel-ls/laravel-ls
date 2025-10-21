@@ -37,6 +37,11 @@ func Test_TypeByFilename(t *testing.T) {
 			filename: "/path/to/.env.local",
 			expected: file.TypeEnv,
 		},
+		{
+			name:     "Failed Env",
+			filename: "/path/to/.envxxx",
+			expected: file.TypeUnknown,
+		},
 	}
 
 	for _, args := range tests {
