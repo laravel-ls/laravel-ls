@@ -14,12 +14,13 @@ jobs:
       matrix:
         go-version: ["1.23"]
         os: [ ubuntu-24.04, windows-latest, macos-15-intel, macos-latest ]
-        arch: [ amd64 ]
-        include:
-          - os: macos-latest
-            arch: arm64
+        arch: [ amd64, arm64 ]
         exclude:
           - os: macos-latest
+            arch: amd64
+          - os: ubuntu-24.04
+            arch: arm64
+          - os: windows-latest
             arch: arm64
     runs-on: ${{matrix.os}}
     name: ${{ matrix.os }} (${{matrix.arch}} go v${{ matrix.go-version }})
