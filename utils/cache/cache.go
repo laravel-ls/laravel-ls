@@ -5,7 +5,6 @@ type Cache[T comparable] struct {
 	items map[string]T
 }
 
-// Create a new cache
 func New[T comparable]() *Cache[T] {
 	return &Cache[T]{
 		items: map[string]T{},
@@ -15,9 +14,9 @@ func New[T comparable]() *Cache[T] {
 // Get a value from the cache by its key.
 // It returns the value and a boolean indicating
 // if the key was found in the cache.
-func (c Cache[T]) Get(key string) (v T, hit bool) {
-	v, hit = c.items[key]
-	return
+func (c Cache[T]) Get(key string) (T, bool) {
+	v, hit := c.items[key]
+	return v, hit
 }
 
 // Set a value in the cache.
@@ -26,7 +25,7 @@ func (c *Cache[T]) Set(key string, value T) {
 	c.items[key] = value
 }
 
-// Gets a value from the cache or generate the value using the provided
+// Remember gets a value from the cache or generate the value using the provided
 // callback if the key is not found. The callback function takes the
 // key as input and returns a value and an error. If the callback
 // succeeds (non-nil error), the value is cached and returned.

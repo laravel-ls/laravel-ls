@@ -13,7 +13,7 @@ type Capture struct {
 
 type CaptureSlice []Capture
 
-// Find all captures with a given name or names.
+// Name finds all captures with a given name or names.
 func (captures CaptureSlice) Name(name ...string) CaptureSlice {
 	nodes := CaptureSlice{}
 	for _, capture := range captures {
@@ -24,7 +24,7 @@ func (captures CaptureSlice) Name(name ...string) CaptureSlice {
 	return nodes
 }
 
-// Find a capture at a given position
+// At finds a capture at a given position
 func (captures CaptureSlice) At(position ts.Point) *ts.Node {
 	for _, capture := range captures {
 		if PointInRange(position, capture.Node.Range()) {
@@ -34,7 +34,7 @@ func (captures CaptureSlice) At(position ts.Point) *ts.Node {
 	return nil
 }
 
-// Find all captures in a given range
+// In finds all captures in a given range
 func (captures CaptureSlice) In(r ts.Range) []*ts.Node {
 	nodes := []*ts.Node{}
 	for _, capture := range captures {

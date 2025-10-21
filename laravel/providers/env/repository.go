@@ -31,9 +31,9 @@ func (r Repository) Find(key string) map[string]env.Variable {
 	return res
 }
 
-func (r Repository) Get(key string) (variable env.Variable, found bool) {
-	variable, found = r.variables[key]
-	return
+func (r Repository) Get(key string) (env.Variable, bool) {
+	variable, found := r.variables[key]
+	return variable, found
 }
 
 func (r Repository) Exists(key string) bool {

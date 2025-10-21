@@ -4,7 +4,7 @@ import (
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
 
-// Returns true if point p is inside range r
+// PointInRange returns true if point p is inside range r
 func PointInRange(p ts.Point, r ts.Range) bool {
 	// Point can not be in range if its row is
 	// before start row or after end row.
@@ -28,13 +28,13 @@ func PointInRange(p ts.Point, r ts.Range) bool {
 	return true
 }
 
-// Returns true if range a and b overlaps. (calculated using point fields)
-func RangeOverlap(a ts.Range, b ts.Range) bool {
+// RangeOverlap returns true if range a and b overlaps. (calculated using point fields)
+func RangeOverlap(a, b ts.Range) bool {
 	return PointInRange(a.StartPoint, b) || PointInRange(b.StartPoint, a)
 }
 
-// Returns true if range a and b overlaps (calculated using byte fields)
-func RangeOverlapBytes(a ts.Range, b ts.Range) bool {
+// RangeOverlapBytes returns true if range a and b overlaps (calculated using byte fields)
+func RangeOverlapBytes(a, b ts.Range) bool {
 	return (a.StartByte >= b.StartByte && a.StartByte <= b.EndByte) ||
 		(b.StartByte >= a.StartByte && b.StartByte <= a.EndByte)
 }

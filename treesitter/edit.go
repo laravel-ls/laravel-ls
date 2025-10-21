@@ -6,8 +6,8 @@ import (
 	ts "github.com/tree-sitter/go-tree-sitter"
 )
 
-// Calculate a treesitter InputEdit object.
-func CalculateEdit(start, end ts.Point, oldSrc []byte, newSrc []byte) *ts.InputEdit {
+// CalculateEdit calculates a treesitter InputEdit object.
+func CalculateEdit(start, end ts.Point, oldSrc, newSrc []byte) *ts.InputEdit {
 	startIndex := PointToByteOffset(start, oldSrc)
 	oldEndIndex := PointToByteOffset(end, oldSrc)
 
@@ -21,7 +21,7 @@ func CalculateEdit(start, end ts.Point, oldSrc []byte, newSrc []byte) *ts.InputE
 	}
 }
 
-// Get the byte count at an specific row.
+// GetRowByte get the byte count at an specific row.
 func GetRowByte(row uint, src []byte) uint {
 	current := uint(0)
 
@@ -37,13 +37,13 @@ func GetRowByte(row uint, src []byte) uint {
 	return 0
 }
 
-// Get the byte offset for a point.
+// PointToByteOffset get the byte offset for a point.
 func PointToByteOffset(point ts.Point, src []byte) uint {
 	// Total byte offset = row + column offset
 	return GetRowByte(point.Row, src) + point.Column
 }
 
-// Calculate a new endpoint
+// CalculateNewEndPoint calculate a new endpoint
 func CalculateNewEndPoint(start ts.Point, src []byte) ts.Point {
 	lines := bytes.Split(src, []byte("\n"))
 	if len(lines) == 1 {

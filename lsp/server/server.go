@@ -220,7 +220,7 @@ func (s *Server) HandleTextDocumentDefinition(params protocol.DefinitionParams) 
 
 	s.providerManager.ResolveDefinition(context)
 
-	return
+	return response, err
 }
 
 func (s Server) HandleTextDocumentDidOpen(params protocol.DidOpenTextDocumentParams) error {

@@ -32,9 +32,9 @@ func (r Repository[T]) Find(input string) map[string]T {
 // Returns:
 //   - value: The value corresponding to the key (zero value if not found).
 //   - found: A boolean indicating whether the key was found in the repository.
-func (r Repository[T]) Get(key string) (value T, found bool) {
-	value, found = r[key]
-	return
+func (r Repository[T]) Get(key string) (T, bool) {
+	value, found := r[key]
+	return value, found
 }
 
 // Exists checks if a specific key exists within the repository.

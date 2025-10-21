@@ -36,7 +36,7 @@ func Get(lang Identifier) *Language {
 	return nil
 }
 
-// Get the language Identifier for a particular filetype
+// FiletypeToLanguage Get the language Identifier for a particular filetype
 func FiletypeToLanguage(t file.Type) Identifier {
 	switch t {
 	case file.TypePHP:

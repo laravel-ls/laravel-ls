@@ -118,7 +118,7 @@ func (p *Provider) Hover(ctx provider.HoverContext) {
 	}
 }
 
-// resolve env() calls to variable
+// ResolveDefinition resolves env() calls to variable
 func (p *Provider) ResolveDefinition(ctx provider.DefinitionContext) {
 	node := queries.EnvCalls(ctx.File).At(ctx.Position)
 	if node != nil {

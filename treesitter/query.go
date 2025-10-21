@@ -16,7 +16,6 @@ var queryCache = cache.New[*ts.Query]()
 
 var ErrQueryNotFound error = errors.New("query not found")
 
-// Read a query from file
 func ReadQueryFromFile(lang *language.Language, name string) (string, error) {
 	filename := path.Join(lang.Name(), name+".scm")
 

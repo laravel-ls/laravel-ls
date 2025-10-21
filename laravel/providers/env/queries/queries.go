@@ -25,7 +25,7 @@ func EnvCalls(file *parser.File) treesitter.CaptureSlice {
 		queryEnvCalls(file, language.PHPOnly)...)
 }
 
-// Check if a env call has a default value.
+// HasDefault check if a env call has a default value.
 func HasDefault(node *ts.Node) bool {
 	parent := node.Parent()
 
