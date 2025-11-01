@@ -34,8 +34,8 @@ func (p *Provider) Hover(ctx provider.HoverContext) {
 		return
 	}
 
-	service := php.GetStringContent(node, ctx.File.Src)
-	if len(service) < 1 {
+	text := php.GetStringContent(node, ctx.File.Src)
+	if len(text) < 1 {
 		return
 	}
 
@@ -45,7 +45,7 @@ func (p *Provider) Hover(ctx provider.HoverContext) {
 		return
 	}
 
-	route, ok := repo.Get(service)
+	route, ok := repo.Get(text)
 	if !ok {
 		return
 	}
@@ -72,7 +72,7 @@ func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
 		return
 	}
 
-	route := php.GetStringContent(node, ctx.File.Src)
+	text := php.GetStringContent(node, ctx.File.Src)
 
 	repo, err := ctx.Project.Routes()
 	if err != nil {
@@ -80,7 +80,7 @@ func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
 		return
 	}
 
-	for key, meta := range repo.Find(route) {
+	for key, meta := range repo.Find(text) {
 		// Follow format from - https://github.com/laravel/vs-code-extension/blob/v1.0.11/src/features/route.ts#L192-L207
 		ctx.Publish(protocol.CompletionItem{
 			Label:  key,
@@ -136,8 +136,8 @@ func (p *Provider) Diagnostic(ctx provider.DiagnosticContext) {
 	}
 
 	for _, capture := range node {
-		route := php.GetStringContent(&capture.Node, ctx.File.Src)
-		if len(route) < 1 || repo.Exists(route) {
+		text := php.GetStringContent(&capture.Node, ctx.File.Src)
+		if len(text) < 1 || repo.Exists(text) {
 			continue
 		}
 
@@ -147,7 +147,7 @@ func (p *Provider) Diagnostic(ctx provider.DiagnosticContext) {
 		ctx.Publish(provider.Diagnostic{
 			Range:    capture.Node.Range(),
 			Severity: protocol.DiagnosticSeverityWarning,
-			Message:  fmt.Sprintf("Route [%s] not found", route),
+			Message:  fmt.Sprintf("Route [%s] not found", text),
 		})
 	}
 }
