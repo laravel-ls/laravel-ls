@@ -73,9 +73,6 @@ func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
 	}
 
 	route := php.GetStringContent(node, ctx.File.Src)
-	if len(route) < 1 {
-		return
-	}
 
 	repo, err := ctx.Project.Routes()
 	if err != nil {
