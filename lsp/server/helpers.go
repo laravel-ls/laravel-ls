@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/laravel-ls/laravel-ls/lsp/protocol"
+	"github.com/laravel-ls/protocol"
 
 	ts "github.com/tree-sitter/go-tree-sitter"
 )

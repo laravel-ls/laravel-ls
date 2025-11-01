@@ -5,9 +5,9 @@ import (
 
 	"github.com/laravel-ls/laravel-ls/file"
 	"github.com/laravel-ls/laravel-ls/laravel/providers/app/queries"
-	"github.com/laravel-ls/laravel-ls/lsp/protocol"
 	"github.com/laravel-ls/laravel-ls/provider"
 	"github.com/laravel-ls/laravel-ls/treesitter/php"
+	"github.com/laravel-ls/protocol"
 )
 
 type Provider struct {

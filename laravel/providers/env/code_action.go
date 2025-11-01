@@ -1,7 +1,7 @@
 package env
 
 import (
-	"github.com/laravel-ls/laravel-ls/lsp/protocol"
+	"github.com/laravel-ls/protocol"
 )
 
 func codeAction(uri protocol.DocumentURI, title string, line int, text string) protocol.CodeAction {

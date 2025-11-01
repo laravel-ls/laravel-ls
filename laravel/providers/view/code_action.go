@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/laravel-ls/laravel-ls/lsp/protocol"
+	"github.com/laravel-ls/protocol"
 )
 
 func createViewCodeAction(root, filename string) protocol.CodeAction {

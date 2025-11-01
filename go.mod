@@ -6,6 +6,7 @@ toolchain go1.24.4
 
 require (
 	github.com/EmranMR/tree-sitter-blade v0.11.1-0.20241209120652-47baa7ba1f9d
+	github.com/laravel-ls/protocol v0.0.0-20251101092054-9061064e9772
 	github.com/laravel-ls/uri v0.0.1
 	github.com/pnx/tree-sitter-dotenv v0.0.1
 	github.com/sirupsen/logrus v1.9.3

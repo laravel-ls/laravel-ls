@@ -7,9 +7,9 @@ import (
 	"github.com/laravel-ls/laravel-ls/file"
 	"github.com/laravel-ls/laravel-ls/laravel/providers/view/queries"
 	"github.com/laravel-ls/laravel-ls/laravel/view"
-	"github.com/laravel-ls/laravel-ls/lsp/protocol"
 	"github.com/laravel-ls/laravel-ls/provider"
 	"github.com/laravel-ls/laravel-ls/treesitter/php"
+	"github.com/laravel-ls/protocol"
 	"github.com/spf13/afero"
 )
 

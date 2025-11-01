@@ -8,10 +8,10 @@ import (
 	"io"
 
 	"github.com/laravel-ls/laravel-ls/cache"
-	"github.com/laravel-ls/laravel-ls/lsp/protocol"
 	"github.com/laravel-ls/laravel-ls/parser"
 	"github.com/laravel-ls/laravel-ls/program"
 	"github.com/laravel-ls/laravel-ls/provider"
+	"github.com/laravel-ls/protocol"
 	"github.com/laravel-ls/uri"
 
 	log "github.com/sirupsen/logrus"
