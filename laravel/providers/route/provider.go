@@ -2,6 +2,7 @@ package route
 
 import (
 	"fmt"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -149,5 +150,41 @@ func (p *Provider) Diagnostic(ctx provider.DiagnosticContext) {
 			Severity: protocol.DiagnosticSeverityWarning,
 			Message:  fmt.Sprintf("Route [%s] not found", text),
 		})
+	}
+}
+
+func (p *Provider) ResolveCodeAction(ctx provider.CodeActionContext) {
+	nodes := queries.RouteCalls(ctx.File).In(ctx.Range)
+	if len(nodes) < 1 {
+		return
+	}
+
+	repo, err := ctx.Project.Routes()
+	if err != nil {
+		ctx.Logger.WithError(err).Warn("failed to get repo")
+		return
+	}
+
+	routeFilename := path.Join(p.rootPath, "routes/web.php")
+	routeFile, err := ctx.FileCache.Open(routeFilename)
+	if err != nil {
+		ctx.Logger.WithError(err).Warn("failed to parse routes/web.php file")
+		return
+	}
+
+	for _, node := range nodes {
+		text := php.GetStringContent(node, ctx.File.Src)
+		if len(text) < 1 {
+			return
+		}
+
+		if _, found := repo.Get(text); !found {
+			uri := protocol.DocumentURI("file://" + routeFilename)
+			line := routeFile.Tree.Root().EndPosition().Row
+
+			code := fmt.Sprintf("\nRoute::get('/', function() {\n    return view('');\n})->name('%s');\n", text)
+
+			ctx.Publish(codeAction(uri, "Add to routes file (web.php)", line, code))
+		}
 	}
 }
