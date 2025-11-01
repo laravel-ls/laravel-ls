@@ -49,7 +49,7 @@ Route::view('/user/profile', 'user.profile')
 - [x] Auto-complete existing template names
 - [ ] Auto-complete for existing arguments present in the template
 - [x] Diagnostics for template files that do not exists
-- [ ] Code action to create view file that do not exists.
+- [x] Code action to create view file that do not exists.
 
 ### Routes
 
@@ -59,12 +59,12 @@ redirect()->route('dashboard');
 URL::route('dashboard');
 ```
 
-- [ ] Hover information shows route definition
-- [ ] Go to definition
-- [ ] Auto-complete existing route names
+- [x] Hover information shows route definition
+- [x] Go to definition
+- [x] Auto-complete existing route names
 - [ ] Auto-complete route arguments
-- [ ] Diagnostics for routes that do not exists
-- [ ] Code action to create a new route if route do not exists.
+- [x] Diagnostics for routes that do not exists
+- [x] Code action to create a new route if route do not exists.
 
 ### Environment
 
