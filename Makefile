@@ -1,20 +1,17 @@
-
 GO = go
 VERSION=$(shell git describe --always --tags --dirty --match="v*")
 GOLDFLAGS=-s -w -X main.version="$(VERSION)"
-
+GOBUILDFLAGS += -v -ldflags="$(GOLDFLAGS)"
 
 ifeq ($(OS), Windows_NT)
 	PROGRAM=./build/laravel-ls.exe
-	GOBUILDFLAGS+=-v -ldflags="$(GOLDFLAGS)"
 	MKBUILDDIR=
-else ifeq ($(shell uname -s), Darwin)
-	PROGRAM=./build/laravel-ls
-	GOBUILDFLAGS+=-v -p $(shell sysctl -n hw.logicalcpu) -ldflags="$(GOLDFLAGS)"
-	MKBUILDDIR=mkdir -p ./build
+# Uncomment this when macos setup diverges from linux.
+# else ifeq ($(shell uname -s), Darwin)
+# 	PROGRAM=./build/laravel-ls
+# 	MKBUILDDIR=mkdir -p ./build
 else
 	PROGRAM=./build/laravel-ls
-	GOBUILDFLAGS+=-v -p $(shell nproc) -ldflags="$(GOLDFLAGS)"
 	MKBUILDDIR=mkdir -p ./build
 endif
 
