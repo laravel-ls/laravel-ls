@@ -15,7 +15,7 @@ var ErrNotAnLaravelProject = errors.New("not a laravel project")
 // execute PHP code and retrieve information from a Laravel project.
 type Project struct {
 	rootPath string
-	process  *runtime.PHPProcess
+	process  runtime.Process
 }
 
 // New initializes a new project by
@@ -42,7 +42,7 @@ func (project Project) RootPath() string {
 }
 
 // Process returns the php process for the project
-func (project Project) Process() *runtime.PHPProcess {
+func (project Project) Process() runtime.Process {
 	return project.process
 }
 
