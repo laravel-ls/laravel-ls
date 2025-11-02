@@ -41,7 +41,7 @@ func (project Project) RootPath() string {
 	return project.rootPath
 }
 
-// RootPath returns the php process for the project
+// Process returns the php process for the project
 func (project Project) Process() *runtime.PHPProcess {
 	return project.process
 }
