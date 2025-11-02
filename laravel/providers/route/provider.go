@@ -3,8 +3,6 @@ package route
 import (
 	"fmt"
 	"path"
-	"path/filepath"
-	"strings"
 
 	"github.com/laravel-ls/laravel-ls/file"
 	"github.com/laravel-ls/laravel-ls/laravel/providers/route/queries"
@@ -51,20 +49,9 @@ func (p *Provider) Hover(ctx provider.HoverContext) {
 		return
 	}
 
-	content := []string{}
-
-	if route.Action == "Closure" {
-		content = append(content, "[Closure]")
-	} else {
-		content = append(content, route.Action)
-	}
-
-	if relativePath, err := filepath.Rel(p.rootPath, route.File); err == nil {
-		content = append(content, fmt.Sprintf("[%s](%s)", relativePath, route.File))
-	}
-
-	// Follow format from - https://github.com/laravel/vs-code-extension/blob/v1.0.11/src/features/route.ts#L110-L115
-	ctx.Publish(provider.Hover{Content: strings.Join(content, "\n\n")})
+	ctx.Publish(provider.Hover{
+		Content: formatHoverContent(p.rootPath, route),
+	})
 }
 
 func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
@@ -82,12 +69,7 @@ func (p *Provider) ResolveCompletion(ctx provider.CompletionContext) {
 	}
 
 	for key, meta := range repo.Find(text) {
-		// Follow format from - https://github.com/laravel/vs-code-extension/blob/v1.0.11/src/features/route.ts#L192-L207
-		ctx.Publish(protocol.CompletionItem{
-			Label:  key,
-			Kind:   protocol.CompletionItemKindEnum,
-			Detail: fmt.Sprintf("%s\n\n[%s] %s", meta.Action, meta.Method, meta.URI),
-		})
+		ctx.Publish(formatCompetionItem(key, meta))
 	}
 }
 
@@ -109,18 +91,7 @@ func (p *Provider) ResolveDefinition(ctx provider.DefinitionContext) {
 	}
 
 	if meta, found := repo.Get(route); found {
-		ctx.Publish(protocol.Location{
-			URI: protocol.DocumentURI(meta.File),
-			// TODO: Maybe refactor this into a helper function
-			Range: protocol.Range{
-				Start: protocol.Position{
-					Line: uint32(meta.Line),
-				},
-				End: protocol.Position{
-					Line: uint32(meta.Line),
-				},
-			},
-		})
+		ctx.Publish(formatLocation(meta))
 	}
 }
 
@@ -182,7 +153,7 @@ func (p *Provider) ResolveCodeAction(ctx provider.CodeActionContext) {
 			uri := protocol.DocumentURI("file://" + routeFilename)
 			line := routeFile.Tree.Root().EndPosition().Row
 
-			code := fmt.Sprintf("\nRoute::get('/', function() {\n    return view('');\n})->name('%s');\n", text)
+			code := fmt.Sprintf(routeTemplate, text)
 
 			ctx.Publish(codeAction(uri, "Add to routes file (web.php)", line, code))
 		}
