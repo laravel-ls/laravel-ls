@@ -143,6 +143,12 @@ asset('main.css');
 
 ## Install
 
+### Prerequisite
+
+The LSP server requires `php 8.3+` installed on the system and available in `$PATH`. 
+For projects using [laravel sail](https://laravel.com/docs/12.x/sail) this is not needed as
+the lsp server will use the binary located inside the sail docker container.
+
 ###  Download via github
 
 Official binaries for Windows and Linux are provided on each [github release](https://github.com/laravel-ls/laravel-ls/releases)
