@@ -181,6 +181,10 @@ laravel-ls
 
 See the official documentation of [go install](https://go.dev/ref/mod#go-install)
 
+### Mason (neovim)
+
+The lsp can be installed using [mason](https://github.com/mason-org/mason.nvim) if you prefer that.
+
 ## Build
 
 To build the project you need golang version `1.23` or later, `make` and a c compiler.
