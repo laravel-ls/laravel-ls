@@ -178,7 +178,7 @@ func (p *Provider) Diagnostic(ctx provider.DiagnosticContext) {
 			if !p.repo.Exists(key) && !queries.HasDefault(&capture.Node) {
 				ctx.Publish(provider.Diagnostic{
 					Range:    capture.Node.Range(),
-					Severity: protocol.DiagnosticSeverityError,
+					Severity: protocol.DiagnosticSeverityWarning,
 					Message:  "Environment variable is not defined",
 				})
 			}
