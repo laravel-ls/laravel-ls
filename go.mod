@@ -8,7 +8,7 @@ require (
 	github.com/EmranMR/tree-sitter-blade v0.11.1-0.20241209120652-47baa7ba1f9d
 	github.com/laravel-ls/protocol v0.0.0-20260208232219-3dcbf4fcbb95
 	github.com/laravel-ls/uri v0.0.1
-	github.com/pnx/tree-sitter-dotenv v0.0.5
+	github.com/pnx/tree-sitter-dotenv v0.0.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/sourcegraph/jsonrpc2 v0.2.0
 	github.com/spf13/afero v1.14.0
