@@ -21,6 +21,12 @@ build:
 	$(MKBUILDDIR)
 	$(GO) build $(GOBUILDFLAGS) -o $(PROGRAM) ./cmd/laravel-ls
 
+release : NEXT_VER = $(shell git-cliff --bumped-version)
+release :
+	git-cliff --bump -o CHANGELOG.md
+	git add CHANGELOG.md
+	git commit -m "chore(version): Bump to $(NEXT_VER)"
+
 generate:
 	$(GO) generate ./...
 
