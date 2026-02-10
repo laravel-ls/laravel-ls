@@ -151,11 +151,7 @@ the lsp server will use the binary located inside the sail docker container.
 
 ###  Download via github
 
-Official binaries for Windows and Linux are provided on each [github release](https://github.com/laravel-ls/laravel-ls/releases)
-
-MacOS users have to use [Install via go](#install-via-go) 
-
-> NOTE: although MacOS is not officially supported, some users have had success building it.
+Official binaries for Windows, Linux and MacOS are provided on each [github release](https://github.com/laravel-ls/laravel-ls/releases)
 
 Just download the program and make sure its located somewhere in your `$PATH`
 
