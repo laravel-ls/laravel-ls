@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/laravel-ls/laravel-ls/cache"
 	"github.com/laravel-ls/laravel-ls/parser"
@@ -14,8 +15,9 @@ import (
 	"github.com/laravel-ls/protocol"
 	"github.com/laravel-ls/uri"
 
+	jsonrpc "github.com/gumeniukcom/golang-jsonrpc2/v2"
+	"github.com/gumeniukcom/golang-jsonrpc2/v2/jsonrpcstdio"
 	log "github.com/sirupsen/logrus"
-	"github.com/sourcegraph/jsonrpc2"
 )
 
 var (
@@ -388,127 +390,159 @@ func (s *Server) HandleTextDocumentInlayHint(params protocol.InlayHintParams) ([
 	return response, nil
 }
 
-// Handle incoming LSP messages
-func (s *Server) dispatch(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) (any, error) {
-	switch req.Method {
-	case protocol.MethodTextDocumentCodeAction:
-		var params protocol.CodeActionParams
-		if err := json.Unmarshal(*req.Params, &params); err != nil {
-			return nil, err
-		}
-		return s.HandleTextDocumentCodeAction(params)
-	case protocol.MethodTextDocumentCompletion:
-		var params protocol.CompletionParams
-		if err := json.Unmarshal(*req.Params, &params); err != nil {
-			return nil, err
-		}
-		return s.HandleTextDocumentCompletion(params)
-	case protocol.MethodTextDocumentHover:
-		var params protocol.HoverParams
-		if err := json.Unmarshal(*req.Params, &params); err != nil {
-			return nil, err
-		}
-		return s.HandleTextDocumentHover(params)
-	case protocol.MethodTextDocumentDiagnostic:
-		var params protocol.DocumentDiagnosticParams
-		if err := json.Unmarshal(*req.Params, &params); err != nil {
-			return nil, err
-		}
-		return s.HandleTextDocumentDiagnostic(params)
-	case protocol.MethodTextDocumentDefinition:
-		var params protocol.DefinitionParams
-		if err := json.Unmarshal(*req.Params, &params); err != nil {
-			return nil, err
-		}
-		return s.HandleTextDocumentDefinition(params)
-	case protocol.MethodTextDocumentDidOpen:
-		var params protocol.DidOpenTextDocumentParams
-		if err := json.Unmarshal(*req.Params, &params); err != nil {
-			return nil, err
-		}
-		return nil, s.HandleTextDocumentDidOpen(params)
-	case protocol.MethodTextDocumentDidChange:
-		var params protocol.DidChangeTextDocumentParams
-		if err := json.Unmarshal(*req.Params, &params); err != nil {
-			return nil, err
-		}
-		return nil, s.HandleTextDocumentDidChange(params)
-	case protocol.MethodTextDocumentDidSave:
-		var params protocol.DidSaveTextDocumentParams
-		if err := json.Unmarshal(*req.Params, &params); err != nil {
-			return nil, err
-		}
-		return nil, s.HandleTextDocumentDidSave(params)
-	case protocol.MethodTextDocumentDidClose:
-		var params protocol.DidCloseTextDocumentParams
-		if err := json.Unmarshal(*req.Params, &params); err != nil {
-			return nil, err
-		}
-		return nil, s.HandleTextDocumentDidClose(params)
-	case protocol.MethodInitialize:
-		var params protocol.InitializeParams
-		if err := json.Unmarshal(*req.Params, &params); err != nil {
-			return nil, err
-		}
-		return s.HandleInitialize(params)
-	case protocol.MethodInitialized:
-		log.WithField("method", protocol.MethodInitialized).
-			Debug("Initialized")
-		return nil, nil
-	case protocol.MethodTextDocumentInlayHint:
-		var params protocol.InlayHintParams
-		if err := json.Unmarshal(*req.Params, &params); err != nil {
-			return nil, err
-		}
-		return s.HandleTextDocumentInlayHint(params)
-	case "$/cancelRequest":
+// registerMethods wires every LSP method onto the dispatcher. Typed
+// registration replaces the previous hand-written dispatch switch: params
+// unmarshaling, routing, and method-not-found responses are handled by the
+// library. exitFn terminates the session (LSP "exit").
+func (s *Server) registerMethods(rpc *jsonrpc.JSONRPC, exitFn func()) error {
+	return errors.Join(
+		jsonrpc.RegisterTyped(rpc, protocol.MethodTextDocumentCodeAction,
+			func(_ context.Context, p protocol.CodeActionParams) ([]protocol.CodeAction, error) {
+				return s.HandleTextDocumentCodeAction(p)
+			}),
+		jsonrpc.RegisterTyped(rpc, protocol.MethodTextDocumentCompletion,
+			func(_ context.Context, p protocol.CompletionParams) (protocol.CompletionResponse, error) {
+				return s.HandleTextDocumentCompletion(p)
+			}),
+		jsonrpc.RegisterTyped(rpc, protocol.MethodTextDocumentHover,
+			func(_ context.Context, p protocol.HoverParams) (protocol.HoverResult, error) {
+				return s.HandleTextDocumentHover(p)
+			}),
+		jsonrpc.RegisterTyped(rpc, protocol.MethodTextDocumentDiagnostic,
+			func(_ context.Context, p protocol.DocumentDiagnosticParams) (protocol.DocumentDiagnosticReport, error) {
+				return s.HandleTextDocumentDiagnostic(p)
+			}),
+		jsonrpc.RegisterTyped(rpc, protocol.MethodTextDocumentDefinition,
+			func(_ context.Context, p protocol.DefinitionParams) (protocol.DefinitionResponse, error) {
+				return s.HandleTextDocumentDefinition(p)
+			}),
+		jsonrpc.RegisterTyped(rpc, protocol.MethodTextDocumentInlayHint,
+			func(_ context.Context, p protocol.InlayHintParams) ([]protocol.InlayHint, error) {
+				return s.HandleTextDocumentInlayHint(p)
+			}),
+		jsonrpc.RegisterTyped(rpc, protocol.MethodInitialize,
+			func(_ context.Context, p protocol.InitializeParams) (protocol.InitializeResult, error) {
+				return s.HandleInitialize(p)
+			}),
+
+		// Notifications: executed, never answered (per the JSON-RPC spec).
+		jsonrpc.RegisterTyped(rpc, protocol.MethodTextDocumentDidOpen,
+			func(_ context.Context, p protocol.DidOpenTextDocumentParams) (struct{}, error) {
+				return struct{}{}, s.HandleTextDocumentDidOpen(p)
+			}),
+		jsonrpc.RegisterTyped(rpc, protocol.MethodTextDocumentDidChange,
+			func(_ context.Context, p protocol.DidChangeTextDocumentParams) (struct{}, error) {
+				return struct{}{}, s.HandleTextDocumentDidChange(p)
+			}),
+		jsonrpc.RegisterTyped(rpc, protocol.MethodTextDocumentDidSave,
+			func(_ context.Context, p protocol.DidSaveTextDocumentParams) (struct{}, error) {
+				return struct{}{}, s.HandleTextDocumentDidSave(p)
+			}),
+		jsonrpc.RegisterTyped(rpc, protocol.MethodTextDocumentDidClose,
+			func(_ context.Context, p protocol.DidCloseTextDocumentParams) (struct{}, error) {
+				return struct{}{}, s.HandleTextDocumentDidClose(p)
+			}),
+		jsonrpc.RegisterTyped(rpc, protocol.MethodInitialized,
+			func(_ context.Context, _ json.RawMessage) (struct{}, error) {
+				log.WithField("method", protocol.MethodInitialized).Debug("Initialized")
+				return struct{}{}, nil
+			}),
+
 		// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#cancelRequest
 		// TODO: Maybe implement a way to cancel requests?
-		return nil, nil
-	case "shutdown":
+		jsonrpc.RegisterTyped(rpc, "$/cancelRequest",
+			func(_ context.Context, _ json.RawMessage) (struct{}, error) {
+				return struct{}{}, nil
+			}),
+
 		// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#shutdown
 		// TODO: Implement shutdown logic if needed - ie. clear temp files, close connections, etc.
-		log.Info("Received shutdown request")
-		s.shutdownReceived = true
-		return nil, nil
-	case "exit":
+		jsonrpc.RegisterTyped(rpc, "shutdown",
+			func(_ context.Context, _ json.RawMessage) (*struct{}, error) {
+				log.Info("Received shutdown request")
+				s.shutdownReceived = true
+				return nil, nil // LSP expects a null result
+			}),
+
 		// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#exit
-		log.Info("Received exit notification")
-		conn.Close()
-		return nil, nil
-	default:
-		log.WithField("method", req.Method).Warn("LSP method not found")
-		return nil, &jsonrpc2.Error{
-			Code:    jsonrpc2.CodeMethodNotFound,
-			Message: fmt.Sprintf("Method %s not found", req.Method),
+		jsonrpc.RegisterTyped(rpc, "exit",
+			func(_ context.Context, _ json.RawMessage) (struct{}, error) {
+				log.Info("Received exit notification")
+				exitFn()
+				return struct{}{}, nil
+			}),
+	)
+}
+
+func (s *Server) Run(ctx context.Context, conn io.ReadWriteCloser) error {
+	rpc := jsonrpc.New()
+	// Error texts never reach the client (the library answers with generic
+	// codes and keeps detail server-side); route that detail through logrus
+	// instead of the library's slog logger so the log stream stays uniform.
+	rpc.SetLogger(nil)
+	rpc.Use(func(method string, next jsonrpc.RPCMethod) jsonrpc.RPCMethod {
+		return func(ctx context.Context, data json.RawMessage) (json.RawMessage, int, error) {
+			res, code, err := next(ctx, data)
+			if err != nil {
+				log.WithField("method", method).WithError(err).Warn("handler error")
+			}
+			return res, code, err
 		}
-	}
-}
+	})
+	// Methods the dispatcher rejects before any handler runs (unknown
+	// method, invalid params) never reach middleware; keep the old Warn for
+	// unknown methods via the observability hook.
+	rpc.SetObserver(func(_ context.Context, info jsonrpc.CallInfo) {
+		if info.Code == jsonrpc.MethodNotFoundErrorCode {
+			log.WithField("method", info.Method).Warn("LSP method not found")
+		}
+	})
+	// The previous implementation had no per-request timeout; the library
+	// defaults to 30s, so raise it to a generous safety bound.
+	rpc.SetDefaultTimeOut(15 * time.Minute)
 
-type jsonRPCLogger struct{}
-
-func (jsonRPCLogger) Printf(format string, v ...any) {
-	log.Tracef(format, v...)
-}
-
-func (s Server) Run(ctx context.Context, conn io.ReadWriteCloser) error {
-	stream := jsonrpc2.NewBufferedStream(conn, jsonrpc2.VSCodeObjectCodec{})
-
-	opts := []jsonrpc2.ConnOpt{}
 	if log.GetLevel() >= log.TraceLevel {
-		opts = append(opts, jsonrpc2.LogMessages(jsonRPCLogger{}))
+		rpc.Use(func(method string, next jsonrpc.RPCMethod) jsonrpc.RPCMethod {
+			return func(ctx context.Context, data json.RawMessage) (json.RawMessage, int, error) {
+				log.WithField("method", method).Trace("jsonrpc: request")
+				res, code, err := next(ctx, data)
+				log.WithField("method", method).WithField("code", code).WithError(err).Trace("jsonrpc: response")
+				return res, code, err
+			}
+		})
 	}
-	log.Info("Started laravel-ls server")
-	rpc := jsonrpc2.NewConn(ctx, stream, jsonrpc2.HandlerWithError(s.dispatch), opts...)
 
-	select {
-	case <-ctx.Done():
-		return fmt.Errorf("context closed")
-	case <-rpc.DisconnectNotify():
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	exitReceived := false
+	exitFn := func() {
+		exitReceived = true
+		// Cancel first, then close the stream so a read blocked on a quiet
+		// pipe wakes up and Serve can return.
+		cancel()
+		_ = conn.Close()
+	}
+	if err := s.registerMethods(rpc, exitFn); err != nil {
+		return err
+	}
+
+	log.Info("Started laravel-ls server")
+	err := jsonrpcstdio.Serve(ctx, rpc, jsonrpcstdio.FramingContentLength, conn, conn)
+
+	switch {
+	case err == nil, exitReceived && errors.Is(err, context.Canceled):
+		// nil: the client closed our stdin. Canceled+exitReceived: the LSP
+		// exit notification ended the session. Either way the connection is
+		// down; per LSP it is an error unless shutdown was requested first.
 		if !s.shutdownReceived {
 			return fmt.Errorf("disconnected without an shutdown request")
 		}
 		return nil
+	case errors.Is(err, context.Canceled):
+		return fmt.Errorf("context closed")
+	default:
+		return err
 	}
 }
 
